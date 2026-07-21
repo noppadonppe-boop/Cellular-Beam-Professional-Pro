@@ -2,7 +2,7 @@ import { AlertTriangle, CheckCircle2, FileStack, Gauge, Weight } from "lucide-re
 import type { ReactNode } from "react";
 import { LoadCaseSummary } from "@/features/loads/components/LoadCaseSummary";
 import { LoadDiagramChart } from "@/features/loads/components/LoadDiagramChart";
-import { analyzeStraightBeamLoadCase, createPhase6BenchmarkLoadCase } from "@/core/loads";
+import { analyzeContinuousBeam, analyzeStraightBeamLoadCase, createPhase10BenchmarkContinuousBeam, createPhase6BenchmarkLoadCase } from "@/core/loads";
 
 const analysis = analyzeStraightBeamLoadCase({
   beamLengthM: 10,
@@ -13,6 +13,7 @@ const analysis = analyzeStraightBeamLoadCase({
   loadCase: createPhase6BenchmarkLoadCase(),
   minimumElementCount: 20,
 });
+const continuous = analyzeContinuousBeam(createPhase10BenchmarkContinuousBeam());
 
 export default function LoadsPage() {
   return (
@@ -42,6 +43,7 @@ export default function LoadsPage() {
         </p>
       </section>
 
+      <section className="continuous-summary"><div><span className="eyebrow">PHASE 10 · CONTINUOUS BEAM</span><h2>Two-span continuous benchmark</h2><p>Three vertical supports with free rotations; reactions and internal end forces from the linear elastic FEM engine.</p></div><div className="continuous-metrics"><span>Total load<strong>{Math.abs(continuous.totalLoadN / 1000).toFixed(1)} kN</strong></span><span>Supports<strong>{continuous.femResult.reactions.length}</strong></span><span>Interior M<strong>{(Math.abs(continuous.femResult.elementEndForces[0]?.end.momentNm ?? 0) / 1000).toFixed(1)} kN·m</strong></span></div></section>
       <section className="loads-layout">
         <div className="loads-main-panel">
           <header>

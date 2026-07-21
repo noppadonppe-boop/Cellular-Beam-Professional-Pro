@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1-9 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight-beam load diagrams, global gross-section member screening, cellular action extraction, and weld/stiffener/concentrated-load review schedules.
+Phases 1-10 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight and continuous beam load analysis, global gross-section member screening, cellular action extraction, and weld/stiffener/concentrated-load review schedules.
 
 ## Prerequisites
 
