@@ -16,6 +16,7 @@ const ReportPage = lazy(() => import("@/features/reports/pages/ReportPage"));
 const SettingsPage = lazy(() => import("@/features/settings/pages/SettingsPage"));
 const VerificationPage = lazy(() => import("@/features/verification/pages/VerificationPage"));
 const SectionsPage = lazy(() => import("@/features/sections/pages/SectionsPage"));
+const ProjectSettingsPage = lazy(() => import("@/features/project-settings/pages/ProjectSettingsPage"));
 
 const deferred = (element: React.ReactNode) => <Suspense fallback={<LoadingState />}>{element}</Suspense>;
 
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "/projects", element: <ProjectsPage /> },
       { path: "/sections", element: deferred(<SectionsPage />) },
       { path: "/projects/:projectId/criteria", element: deferred(<CriteriaPage />) },
+      { path: "/projects/:projectId/settings", element: deferred(<ProjectSettingsPage />) },
       { path: "/projects/:projectId/geometry", element: deferred(<GeometryPage />) },
       { path: "/projects/:projectId/loads", element: deferred(<LoadsPage />) },
       { path: "/projects/:projectId/analysis", element: deferred(<AnalysisPage />) },

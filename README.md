@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1–2 establish a production-oriented Vite + React foundation and a verified engineering quantity, material, and symmetric I-section property core. Structural analysis has deliberately **not** started.
+Phases 1–3 establish the application, engineering quantity/section core, validated project settings, Firebase Authentication, and role-based Firebase Security Rules. Structural analysis has deliberately **not** started.
 
 ## Prerequisites
 
@@ -65,6 +65,7 @@ npx playwright install chromium
 - `/projects`
 - `/sections`
 - `/projects/:projectId/criteria`
+- `/projects/:projectId/settings`
 - `/projects/:projectId/geometry`
 - `/projects/:projectId/loads`
 - `/projects/:projectId/analysis`
@@ -124,4 +125,4 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 
 ## Current limitations
 
-Authentication actions, structural analysis, cellular-beam checks, design checks, and report generation remain intentionally unimplemented. Phase 2 supports unit-safe quantities, material contracts, custom symmetric I-sections, property calculations, verification benchmarks, and a Firestore section repository adapter.
+Structural analysis, cellular-beam checks, design checks, and report generation remain intentionally unimplemented. Phase 3 adds Firebase email/password and Google sign-in adapters, validated project settings snapshots, Firestore/Storage default-deny rules, immutable approvals/audit boundaries, and role permission tests. Run Firebase emulators before rule-integration development with `npx firebase emulators:start`.

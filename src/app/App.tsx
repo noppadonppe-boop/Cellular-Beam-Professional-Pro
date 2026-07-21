@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/feedback/ErrorBoundary";
 import { ToastViewport } from "@/components/feedback/ToastViewport";
 import { router } from "@/app/router";
 import { useAppStore } from "@/stores/app-store";
+import { AuthProvider } from "@/features/auth/AuthProvider";
 
 export function App() {
   const theme = useAppStore((state) => state.theme);
@@ -11,7 +12,7 @@ export function App() {
 
   return (
     <ErrorBoundary>
-      <RouterProvider router={router} />
+      <AuthProvider><RouterProvider router={router} /></AuthProvider>
       <ToastViewport />
     </ErrorBoundary>
   );

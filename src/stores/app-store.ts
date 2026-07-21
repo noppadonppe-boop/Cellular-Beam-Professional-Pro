@@ -16,7 +16,7 @@ export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
       theme: "light",
-      locale: "th",
+      locale: "en",
       sidebarOpen: false,
       toggleTheme: () => set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
       setLocale: (locale) => set({ locale }),

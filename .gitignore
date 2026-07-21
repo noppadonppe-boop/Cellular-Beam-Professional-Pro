@@ -43,3 +43,6 @@ next-env.d.ts
 /outputs/
 /work/
 .dev-server.*.log
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

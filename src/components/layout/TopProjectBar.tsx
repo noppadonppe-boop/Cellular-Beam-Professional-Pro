@@ -25,7 +25,9 @@ export function TopProjectBar() {
         </div>
       </div>
       <div className="topbar-actions">
-        <span className="saved-state"><i /> Saved</span>
+        <span className="saved-state">
+          <i /> Saved
+        </span>
         <Button
           variant="outline"
           size="sm"

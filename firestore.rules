@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isSystemAdmin() { return signedIn() && request.auth.token.systemAdmin == true; }
+    function organizationMember(orgId) { return signedIn() && exists(/databases/$(database)/documents/organizationMembers/$(orgId + '_' + request.auth.uid)); }
+    function organizationRole(orgId) { return get(/databases/$(database)/documents/organizationMembers/$(orgId + '_' + request.auth.uid)).data.role; }
+    function projectMember(projectId) { return signedIn() && exists(/databases/$(database)/documents/projectMembers/$(projectId + '_' + request.auth.uid)); }
+    function projectRole(projectId) { return get(/databases/$(database)/documents/projectMembers/$(projectId + '_' + request.auth.uid)).data.role; }
+    function canEditProject(projectId) { return projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'designer']; }
+    function canReviewProject(projectId) { return projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'checker']; }
+    function canApproveProject(projectId) { return projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'approver']; }
+
+    match /users/{userId} { allow read, update: if signedIn() && request.auth.uid == userId; allow create: if signedIn() && request.auth.uid == userId; }
+    match /organizations/{orgId} { allow read: if organizationMember(orgId); allow create: if signedIn(); allow update: if organizationMember(orgId) && organizationRole(orgId) == 'organizationAdmin'; }
+    match /organizationMembers/{membershipId} { allow read: if signedIn() && resource.data.userId == request.auth.uid; allow write: if isSystemAdmin(); }
+    match /projects/{projectId} { allow read: if projectMember(projectId); allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid && organizationMember(request.resource.data.organizationId); allow update: if canEditProject(projectId); allow delete: if projectMember(projectId) && projectRole(projectId) == 'projectAdmin'; }
+    match /projectMembers/{membershipId} { allow read: if signedIn() && resource.data.userId == request.auth.uid; allow write: if isSystemAdmin(); }
+    match /projectSettings/{projectId} { allow read: if projectMember(projectId); allow create, update: if canEditProject(projectId) && request.resource.data.projectId == projectId; allow delete: if projectMember(projectId) && projectRole(projectId) == 'projectAdmin'; }
+    match /beamModels/{documentId} { allow read: if projectMember(resource.data.projectId); allow create: if canEditProject(request.resource.data.projectId); allow update, delete: if canEditProject(resource.data.projectId); }
+    match /sections/{sectionId} { allow read: if signedIn() && (resource.data.provenance.verificationStatus == 'verified' || organizationMember(resource.data.organizationId)); allow create: if signedIn() && organizationMember(request.resource.data.organizationId) && request.resource.data.provenance.verificationStatus != 'verified'; allow update: if isSystemAdmin() || (organizationMember(resource.data.organizationId) && request.resource.data.provenance.verificationStatus != 'verified'); allow delete: if isSystemAdmin(); }
+    match /reviewComments/{commentId} { allow read: if projectMember(resource.data.projectId); allow create: if canReviewProject(request.resource.data.projectId); allow update, delete: if signedIn() && resource.data.authorId == request.auth.uid; }
+    match /approvals/{approvalId} { allow read: if projectMember(resource.data.projectId); allow create: if canApproveProject(request.resource.data.projectId) && request.resource.data.approverId == request.auth.uid; allow update, delete: if false; }
+    match /formulaRegistry/{formulaId} { allow read: if signedIn(); allow write: if isSystemAdmin(); }
+    match /auditLogs/{logId} { allow read: if projectMember(resource.data.projectId); allow create: if signedIn() && projectMember(request.resource.data.projectId); allow update, delete: if false; }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

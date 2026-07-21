@@ -24,6 +24,7 @@ export const navGroups = [
       { labelKey: "dashboard", to: "/dashboard", icon: Gauge },
       { labelKey: "projects", to: "/projects", icon: FolderKanban },
       { labelKey: "criteria", to: "/projects/demo/criteria", icon: SlidersHorizontal },
+      { label: "Project Settings", to: "/projects/demo/settings", icon: Settings },
     ],
   },
   {

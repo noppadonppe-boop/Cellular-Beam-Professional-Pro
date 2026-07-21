@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockKeyhole } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { firebaseEnvResult } from "@/lib/env";
 import { useNotificationStore } from "@/stores/notification-store";
+import { useAuth } from "@/features/auth/AuthProvider";
 
 const loginSchema = z.object({
   email: z.email("Invalid email address"),
@@ -15,17 +16,36 @@ type LoginValues = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const notify = useNotificationStore((state) => state.notify);
+  const { signInEmail, signInGoogle, status } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
-  const onSubmit = () => {
-    notify({
-      tone: "info",
-      title: "Authentication foundation",
-      message: "Firebase sign-in will be activated after project credentials are configured.",
-    });
+  const onSubmit = async (values: LoginValues) => {
+    try {
+      await signInEmail(values.email, values.password);
+      void navigate("/dashboard");
+    } catch (error) {
+      notify({
+        tone: "error",
+        title: "Sign-in failed",
+        message: error instanceof Error ? error.message : "Unable to sign in.",
+      });
+    }
+  };
+  const onGoogle = async () => {
+    try {
+      await signInGoogle();
+      void navigate("/dashboard");
+    } catch (error) {
+      notify({
+        tone: "error",
+        title: "Google sign-in failed",
+        message: error instanceof Error ? error.message : "Unable to sign in.",
+      });
+    }
   };
   return (
     <main className="login-page">
@@ -44,8 +64,8 @@ export function LoginPage() {
           <div className="phase-note">
             <LockKeyhole size={18} />
             <span>
-              Phase 1 establishes secure application infrastructure. Engineering calculations are
-              not included.
+              Phase 3 adds Firebase authentication and role-based security. Engineering calculations
+              are not included.
             </span>
           </div>
         </div>
@@ -84,6 +104,16 @@ export function LoginPage() {
           </label>
           <Button type="submit" disabled={isSubmitting}>
             Continue
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={status === "unavailable"}
+            onClick={() => {
+              void onGoogle();
+            }}
+          >
+            Continue with Google
           </Button>
           {!firebaseEnvResult.success && (
             <div className="env-warning">
