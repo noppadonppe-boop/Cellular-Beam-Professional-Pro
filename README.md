@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1–4 establish the application, engineering quantity/section core, project security, and a deterministic straight cellular-beam geometry generator. Structural analysis has deliberately **not** started.
+Phases 1-5 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, and a verified 2D linear FEM analysis engine. Design checks remain deliberately **not** started.
 
 ## Prerequisites
 
@@ -107,6 +107,7 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 - **Application layer:** Router, shell, providers, theme, locale, and notifications.
 - **Infrastructure layer:** Firebase initialization from validated environment variables.
 - **Engineering core boundary:** Deterministic pure TypeScript only; no UI or persistence imports.
+- **2D FEM analysis engine:** Linear elastic Euler-Bernoulli frame elements with 3 DOF per node, dense matrix assembly, nodal loads, uniform local element loads, restraints, reactions, and local element end-force recovery.
 - **Presentation layer:** Responsive React components and shadcn/ui-compatible primitives styled with Tailwind CSS.
 
 ## Coding conventions
@@ -125,4 +126,4 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 
 ## Current limitations
 
-Structural analysis, cellular-beam capacity checks, design checks, and report generation remain intentionally unimplemented. Phase 4 supports deterministic straight-beam circular opening layout, tee geometry, web-post geometry, end-zone validation, opening schedules, interactive SVG elevation, and secured draft persistence. Asymmetric parent sections, reinforcement, stiffeners, camber, exclusion zones, and fabrication-ready detailing are deferred. Run Firebase emulators before rule-integration development with `npm run test:rules`.
+Cellular-beam capacity checks, design checks, and report generation remain intentionally unimplemented. Phase 5 supports verified 2D linear static frame analysis for straight benchmark beams, but does not yet model cellular opening stress concentration, Vierendeel checks, web-post buckling, weld capacity, nonlinear effects, or code-based design utilization. Phase 4 geometry limitations still apply: asymmetric parent sections, reinforcement, stiffeners, camber, exclusion zones, and fabrication-ready detailing are deferred. Run Firebase emulators before rule-integration development with `npm run test:rules`.

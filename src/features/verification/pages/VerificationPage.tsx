@@ -1,5 +1,6 @@
 import { CheckCircle2, FlaskConical, ShieldCheck } from "lucide-react";
 import { generateCellularGeometry } from "@/core/cellular";
+import { runFemBenchmarks } from "@/core/fem";
 import { convert, quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
 
@@ -35,7 +36,7 @@ const cellularGeometry = generateCellularGeometry({
   cuttingPattern: "circular-interlock",
   weldType: "continuous-fillet",
 });
-const benchmarks: Benchmark[] = [
+const engineeringBenchmarks: Benchmark[] = [
   {
     name: "1 kgf → N",
     expected: 9.80665,
@@ -117,6 +118,8 @@ const benchmarks: Benchmark[] = [
     source: "pitch − opening diameter, CBP-CG-001",
   },
 ];
+const femBenchmarks: Benchmark[] = runFemBenchmarks();
+const benchmarks: Benchmark[] = [...engineeringBenchmarks, ...femBenchmarks];
 
 export default function VerificationPage() {
   const passing = benchmarks.filter(
@@ -141,17 +144,17 @@ export default function VerificationPage() {
       <div className="verification-notice">
         <FlaskConical size={18} />
         <p>
-          These are engineering-foundation and geometry-generation benchmarks only. Structural
-          analysis and design verification have not started.
+          These are engineering-foundation, geometry-generation, and 2D linear FEM benchmarks.
+          Design verification and cellular opening capacity checks have not started.
         </p>
       </div>
       <section className="benchmark-card">
         <div className="benchmark-heading">
           <div>
             <span className="eyebrow">RUNTIME EVIDENCE</span>
-            <h2>Units, sections & cellular geometry</h2>
+            <h2>Units, sections, cellular geometry & FEM</h2>
           </div>
-          <span>Revision: Phase 4.0</span>
+          <span>Revision: Phase 5.0</span>
         </div>
         <div className="benchmark-table-wrap">
           <table className="benchmark-table">
@@ -210,6 +213,10 @@ export default function VerificationPage() {
         </div>
         <div>
           <span>Cellular geometry</span>
+          <strong>6 tests</strong>
+        </div>
+        <div>
+          <span>2D FEM analysis</span>
           <strong>6 tests</strong>
         </div>
       </section>
