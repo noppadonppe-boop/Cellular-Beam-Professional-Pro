@@ -10,6 +10,10 @@ type NotificationState = {
 
 export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: [],
-  notify: (notification) => set((state) => ({ notifications: [...state.notifications, { ...notification, id: crypto.randomUUID() }] })),
-  dismiss: (id) => set((state) => ({ notifications: state.notifications.filter((item) => item.id !== id) })),
+  notify: (notification) =>
+    set((state) => ({
+      notifications: [...state.notifications, { ...notification, id: crypto.randomUUID() }],
+    })),
+  dismiss: (id) =>
+    set((state) => ({ notifications: state.notifications.filter((item) => item.id !== id) })),
 }));

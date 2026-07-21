@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phase 1 establishes a production-oriented Vite + React + strict TypeScript foundation for a professional cellular-beam engineering application. It deliberately does **not** produce engineering calculations, utilization ratios, or PASS/FAIL results.
+Phases 1–2 establish a production-oriented Vite + React foundation and a verified engineering quantity, material, and symmetric I-section property core. Structural analysis has deliberately **not** started.
 
 ## Prerequisites
 
@@ -63,6 +63,7 @@ npx playwright install chromium
 - `/login`
 - `/dashboard`
 - `/projects`
+- `/sections`
 - `/projects/:projectId/criteria`
 - `/projects/:projectId/geometry`
 - `/projects/:projectId/loads`
@@ -87,7 +88,8 @@ src/
     auth/ projects/ criteria/ geometry/ loads/
     analysis/ design/ reports/ settings/ verification/
   core/                 Pure TypeScript engineering boundary
-    quantities/ fem/ standards/
+    quantities/ materials/ sections/ schemas/ fem/ standards/
+  infrastructure/       Firebase repository adapters
   lib/                  Environment, Firebase, i18n, utilities
   stores/               Zustand application stores
   styles/               Tailwind and design tokens
@@ -122,4 +124,4 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 
 ## Current limitations
 
-Authentication actions, Firestore persistence, engineering quantities, analysis, design checks, and report generation are intentionally not implemented in Phase 1.
+Authentication actions, structural analysis, cellular-beam checks, design checks, and report generation remain intentionally unimplemented. Phase 2 supports unit-safe quantities, material contracts, custom symmetric I-sections, property calculations, verification benchmarks, and a Firestore section repository adapter.

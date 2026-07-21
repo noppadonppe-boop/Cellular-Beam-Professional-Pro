@@ -9,13 +9,16 @@ type FirebaseServices = { app: FirebaseApp; auth: Auth; db: Firestore; storage: 
 export function initializeFirebase(): FirebaseServices | null {
   const env = getFirebaseEnvironment();
   if (!env) return null;
-  const app = getApps().length > 0 ? getApp() : initializeApp({
-    apiKey: env.VITE_FIREBASE_API_KEY,
-    authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: env.VITE_FIREBASE_APP_ID,
-  });
+  const app =
+    getApps().length > 0
+      ? getApp()
+      : initializeApp({
+          apiKey: env.VITE_FIREBASE_API_KEY,
+          authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+          projectId: env.VITE_FIREBASE_PROJECT_ID,
+          storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET,
+          messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+          appId: env.VITE_FIREBASE_APP_ID,
+        });
   return { app, auth: getAuth(app), db: getFirestore(app), storage: getStorage(app) };
 }
