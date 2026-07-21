@@ -61,11 +61,15 @@ export function analyzeLinearFrame2D(input: FemAnalysisInput): FemAnalysisResult
 
   for (const load of input.uniformElementLoads ?? []) {
     const element = input.elements.find((item) => item.id === load.elementId);
-    if (!element) throw new FemAnalysisError(`Uniform load references unknown element ${load.elementId}.`);
+    if (!element)
+      throw new FemAnalysisError(`Uniform load references unknown element ${load.elementId}.`);
     const dofs = elementDofs(element, nodeIndex);
     const geometry = getElementGeometry(element, input.nodes, nodeIndex);
     const localFixedEnd = equivalentUniformLoadVector(load, geometry.lengthM);
-    const globalFixedEnd = multiplyMatrixVector(transpose(transformationMatrix(geometry)), localFixedEnd);
+    const globalFixedEnd = multiplyMatrixVector(
+      transpose(transformationMatrix(geometry)),
+      localFixedEnd,
+    );
     for (let index = 0; index < dofs.length; index += 1) {
       const dof = readVectorValue(dofs, index, "element DOF map");
       loadVector[dof] =
@@ -113,16 +117,33 @@ export function localFrameStiffness(element: FemFrameElement, lengthM: number): 
   return [
     [axial, 0, 0, -axial, 0, 0],
     [0, (12 * flexural) / l3, (6 * flexural) / l2, 0, (-12 * flexural) / l3, (6 * flexural) / l2],
-    [0, (6 * flexural) / l2, (4 * flexural) / lengthM, 0, (-6 * flexural) / l2, (2 * flexural) / lengthM],
+    [
+      0,
+      (6 * flexural) / l2,
+      (4 * flexural) / lengthM,
+      0,
+      (-6 * flexural) / l2,
+      (2 * flexural) / lengthM,
+    ],
     [-axial, 0, 0, axial, 0, 0],
     [0, (-12 * flexural) / l3, (-6 * flexural) / l2, 0, (12 * flexural) / l3, (-6 * flexural) / l2],
-    [0, (6 * flexural) / l2, (2 * flexural) / lengthM, 0, (-6 * flexural) / l2, (4 * flexural) / lengthM],
+    [
+      0,
+      (6 * flexural) / l2,
+      (2 * flexural) / lengthM,
+      0,
+      (-6 * flexural) / l2,
+      (4 * flexural) / lengthM,
+    ],
   ];
 }
 
 function transformedStiffness(element: FemFrameElement, geometry: ElementGeometry): Matrix {
   const transform = transformationMatrix(geometry);
-  return multiplyMatrix(multiplyMatrix(transpose(transform), localFrameStiffness(element, geometry.lengthM)), transform);
+  return multiplyMatrix(
+    multiplyMatrix(transpose(transform), localFrameStiffness(element, geometry.lengthM)),
+    transform,
+  );
 }
 
 function transformationMatrix({ cos, sin }: ElementGeometry): Matrix {
@@ -160,12 +181,18 @@ function recoverElementEndForces(
     const globalDisplacements = dofs.map((dof) =>
       readVectorValue(displacementVector, dof, "global displacement vector"),
     );
-    const localDisplacements = multiplyMatrixVector(transformationMatrix(geometry), globalDisplacements);
-    const elementLoad = input.uniformElementLoads?.find((load) => load.elementId === element.id);
-    const fixedEnd = elementLoad ? equivalentUniformLoadVector(elementLoad, geometry.lengthM) : [0, 0, 0, 0, 0, 0];
-    const localForces = multiplyMatrixVector(localFrameStiffness(element, geometry.lengthM), localDisplacements).map(
-      (force, index) => force - readVectorValue(fixedEnd, index, "fixed-end vector"),
+    const localDisplacements = multiplyMatrixVector(
+      transformationMatrix(geometry),
+      globalDisplacements,
     );
+    const elementLoad = input.uniformElementLoads?.find((load) => load.elementId === element.id);
+    const fixedEnd = elementLoad
+      ? equivalentUniformLoadVector(elementLoad, geometry.lengthM)
+      : [0, 0, 0, 0, 0, 0];
+    const localForces = multiplyMatrixVector(
+      localFrameStiffness(element, geometry.lengthM),
+      localDisplacements,
+    ).map((force, index) => force - readVectorValue(fixedEnd, index, "fixed-end vector"));
     return {
       elementId: element.id,
       start: {
@@ -209,7 +236,9 @@ function recoverReactions(
       const base = getNodeDofBase(node.id, nodeIndex);
       return {
         nodeId: node.id,
-        fxN: restrainedDofs.has(base) ? readVectorValue(reactionVector, base, "reaction vector") : 0,
+        fxN: restrainedDofs.has(base)
+          ? readVectorValue(reactionVector, base, "reaction vector")
+          : 0,
         fyN: restrainedDofs.has(base + 1)
           ? readVectorValue(reactionVector, base + 1, "reaction vector")
           : 0,
@@ -263,23 +292,33 @@ function getElementGeometry(
 }
 
 function validateInput(input: FemAnalysisInput): void {
-  if (input.nodes.length === 0) throw new FemAnalysisError("Analysis model must contain at least one node.");
-  if (input.elements.length === 0) throw new FemAnalysisError("Analysis model must contain at least one element.");
+  if (input.nodes.length === 0)
+    throw new FemAnalysisError("Analysis model must contain at least one node.");
+  if (input.elements.length === 0)
+    throw new FemAnalysisError("Analysis model must contain at least one element.");
   const nodeIds = new Set<string>();
   for (const node of input.nodes) {
     if (nodeIds.has(node.id)) throw new FemAnalysisError(`Duplicate node id ${node.id}.`);
     nodeIds.add(node.id);
-    if (![node.xM, node.yM].every(Number.isFinite)) throw new FemAnalysisError(`Node ${node.id} has invalid coordinates.`);
+    if (![node.xM, node.yM].every(Number.isFinite))
+      throw new FemAnalysisError(`Node ${node.id} has invalid coordinates.`);
   }
   const elementIds = new Set<string>();
   for (const element of input.elements) {
-    if (elementIds.has(element.id)) throw new FemAnalysisError(`Duplicate element id ${element.id}.`);
+    if (elementIds.has(element.id))
+      throw new FemAnalysisError(`Duplicate element id ${element.id}.`);
     elementIds.add(element.id);
     if (!nodeIds.has(element.startNodeId) || !nodeIds.has(element.endNodeId)) {
       throw new FemAnalysisError(`Element ${element.id} references unknown nodes.`);
     }
-    if (![element.areaM2, element.inertiaM4, element.elasticModulusPa].every((value) => Number.isFinite(value) && value > 0)) {
-      throw new FemAnalysisError(`Element ${element.id} has invalid section or material properties.`);
+    if (
+      ![element.areaM2, element.inertiaM4, element.elasticModulusPa].every(
+        (value) => Number.isFinite(value) && value > 0,
+      )
+    ) {
+      throw new FemAnalysisError(
+        `Element ${element.id} has invalid section or material properties.`,
+      );
     }
   }
 }

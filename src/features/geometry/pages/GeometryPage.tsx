@@ -46,10 +46,7 @@ export default function GeometryPage() {
     mode: "onChange",
   });
   const watched = useWatch({ control: form.control });
-  const geometry = useMemo(
-    () => generateCellularGeometry({ ...defaults, ...watched }),
-    [watched],
-  );
+  const geometry = useMemo(() => generateCellularGeometry({ ...defaults, ...watched }), [watched]);
 
   const save = form.handleSubmit(async (values) => {
     if (!geometry.isValid) {

@@ -48,7 +48,9 @@ describe("straight beam load cases and diagrams", () => {
       includeSelfWeight: false,
       source: "benchmark",
       revision: "test",
-      loads: [{ id: "W", type: "uniform", startXM: 0, endXM: 10, magnitudeNPerM: -18_000, label: "UDL" }],
+      loads: [
+        { id: "W", type: "uniform", startXM: 0, endXM: 10, magnitudeNPerM: -18_000, label: "UDL" },
+      ],
     };
 
     const result = analyzeStraightBeamLoadCase({ ...baseInput, loadCase, minimumElementCount: 10 });
@@ -66,7 +68,8 @@ describe("straight beam load cases and diagrams", () => {
       minimumElementCount: 20,
     });
 
-    const selfWeight = -baseInput.areaM2 * baseInput.steelDensityKgM3 * 9.80665 * baseInput.beamLengthM;
+    const selfWeight =
+      -baseInput.areaM2 * baseInput.steelDensityKgM3 * 9.80665 * baseInput.beamLengthM;
     expect(result.totalVerticalLoadN).toBeCloseTo(-160_000 + selfWeight, 9);
   });
 
@@ -79,7 +82,16 @@ describe("straight beam load cases and diagrams", () => {
       includeSelfWeight: false,
       source: "userDefined",
       revision: "test",
-      loads: [{ id: "W", type: "uniform", startXM: 0, endXM: 12, magnitudeNPerM: -10_000, label: "Bad UDL" }],
+      loads: [
+        {
+          id: "W",
+          type: "uniform",
+          startXM: 0,
+          endXM: 12,
+          magnitudeNPerM: -10_000,
+          label: "Bad UDL",
+        },
+      ],
     };
 
     expect(() => analyzeStraightBeamLoadCase({ ...baseInput, loadCase })).toThrow(LoadCaseError);
@@ -87,7 +99,9 @@ describe("straight beam load cases and diagrams", () => {
 
   it("keeps runtime load diagram benchmarks passing", () => {
     for (const benchmark of runLoadDiagramBenchmarks()) {
-      expect(Math.abs(benchmark.actual - benchmark.expected)).toBeLessThanOrEqual(benchmark.tolerance);
+      expect(Math.abs(benchmark.actual - benchmark.expected)).toBeLessThanOrEqual(
+        benchmark.tolerance,
+      );
     }
   });
 });

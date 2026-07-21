@@ -6,10 +6,12 @@ type Props = Readonly<{
 }>;
 
 export function LoadCaseSummary({ analysis }: Props) {
-  const leftReaction = analysis.femResult.reactions.find((reaction) => reaction.nodeId === "N1")?.fyN ?? 0;
+  const leftReaction =
+    analysis.femResult.reactions.find((reaction) => reaction.nodeId === "N1")?.fyN ?? 0;
   const rightReaction =
-    analysis.femResult.reactions.find((reaction) => reaction.nodeId === `N${String(analysis.femInput.nodes.length)}`)
-      ?.fyN ?? 0;
+    analysis.femResult.reactions.find(
+      (reaction) => reaction.nodeId === `N${String(analysis.femInput.nodes.length)}`,
+    )?.fyN ?? 0;
 
   return (
     <aside className="load-side-panel">
@@ -27,7 +29,9 @@ export function LoadCaseSummary({ analysis }: Props) {
         </div>
         <div>
           <dt>Source</dt>
-          <dd>{analysis.loadCase.source === "benchmark" ? "DEMO BENCHMARK" : analysis.loadCase.source}</dd>
+          <dd>
+            {analysis.loadCase.source === "benchmark" ? "DEMO BENCHMARK" : analysis.loadCase.source}
+          </dd>
         </div>
         <div>
           <dt>Total vertical load</dt>
@@ -53,7 +57,11 @@ export function LoadCaseSummary({ analysis }: Props) {
             <Weight size={14} />
             <div>
               <strong>{load.label}</strong>
-              <span>{load.type === "uniform" ? formatUniform(load.magnitudeNPerM) : formatForce(load.fyN)}</span>
+              <span>
+                {load.type === "uniform"
+                  ? formatUniform(load.magnitudeNPerM)
+                  : formatForce(load.fyN)}
+              </span>
             </div>
           </article>
         ))}

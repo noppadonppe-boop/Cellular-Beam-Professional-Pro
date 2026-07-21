@@ -2,6 +2,7 @@ import { CheckCircle2, FlaskConical, ShieldCheck } from "lucide-react";
 import { generateCellularGeometry } from "@/core/cellular";
 import { runFemBenchmarks } from "@/core/fem";
 import { runLoadDiagramBenchmarks } from "@/core/loads";
+import { checkGlobalSteelMember } from "@/core/design";
 import { convert, quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
 
@@ -121,7 +122,56 @@ const engineeringBenchmarks: Benchmark[] = [
 ];
 const femBenchmarks: Benchmark[] = runFemBenchmarks();
 const loadDiagramBenchmarks: Benchmark[] = runLoadDiagramBenchmarks();
-const benchmarks: Benchmark[] = [...engineeringBenchmarks, ...femBenchmarks, ...loadDiagramBenchmarks];
+const memberBenchmark = checkGlobalSteelMember({
+  sectionProperties: section,
+  sectionGeometry: {
+    depth: quantity(300, "mm", "length"),
+    flangeWidth: quantity(150, "mm", "length"),
+    webThickness: quantity(6.5, "mm", "length"),
+    flangeThickness: quantity(9, "mm", "length"),
+  },
+  steelGrade: {
+    id: "BENCH",
+    name: "Benchmark",
+    kind: "steel",
+    gradeDesignation: "S355",
+    elasticModulus: quantity(200000, "MPa", "stress"),
+    poissonRatio: 0.3,
+    density: { value: 7850, unit: "kg/m³" },
+    yieldStrength: quantity(355, "MPa", "stress"),
+    ultimateStrength: quantity(510, "MPa", "stress"),
+    provenance: {
+      sourceName: "Benchmark",
+      sourceReference: "CBP-D-001",
+      revision: "Phase 7.0",
+      retrievedAtIso: "2026-01-01T00:00:00.000Z",
+      verificationStatus: "verified",
+    },
+  },
+  spanM: 10,
+  unbracedLengthM: 10,
+  maximumMomentNm: 100000,
+  maximumShearN: 10000,
+  maximumDeflectionM: 0.01,
+  deflectionLimitRatio: 360,
+  basis: { reference: "Benchmark", revision: "Phase 7.0", resistanceFactor: 1 },
+});
+const memberBenchmarks: Benchmark[] = [
+  {
+    name: "Gross section flexural yield",
+    expected: 355000000 * section.plasticModulusX.canonicalValue,
+    actual: memberBenchmark.checks.find((item) => item.id === "flexure-yield")?.capacity ?? 0,
+    unit: "N·m",
+    tolerance: 1e-8,
+    source: "Fy Zx, CBP-D-001",
+  },
+];
+const benchmarks: Benchmark[] = [
+  ...engineeringBenchmarks,
+  ...femBenchmarks,
+  ...loadDiagramBenchmarks,
+  ...memberBenchmarks,
+];
 
 export default function VerificationPage() {
   const passing = benchmarks.filter(
@@ -146,18 +196,18 @@ export default function VerificationPage() {
       <div className="verification-notice">
         <FlaskConical size={18} />
         <p>
-          These are engineering-foundation, geometry-generation, 2D linear FEM, and straight-beam
-          load diagram benchmarks. Design verification and cellular opening capacity checks have
-          not started.
+          These are engineering-foundation, geometry-generation, 2D linear FEM, load diagram, and
+          gross-section member-screening benchmarks. Code-specific stability and cellular opening
+          checks remain unevaluated.
         </p>
       </div>
       <section className="benchmark-card">
         <div className="benchmark-heading">
           <div>
             <span className="eyebrow">RUNTIME EVIDENCE</span>
-            <h2>Units, sections, cellular geometry, FEM & diagrams</h2>
+            <h2>Units, sections, cellular geometry, FEM, diagrams & member screening</h2>
           </div>
-          <span>Revision: Phase 6.0</span>
+          <span>Revision: Phase 7.0</span>
         </div>
         <div className="benchmark-table-wrap">
           <table className="benchmark-table">
@@ -225,6 +275,10 @@ export default function VerificationPage() {
         <div>
           <span>Load diagrams</span>
           <strong>5 tests</strong>
+        </div>
+        <div>
+          <span>Global steel member screening</span>
+          <strong>3 tests</strong>
         </div>
       </section>
     </div>

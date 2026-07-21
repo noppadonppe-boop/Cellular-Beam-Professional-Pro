@@ -28,9 +28,15 @@ export function runLoadDiagramBenchmarks(): LoadDiagramBenchmark[] {
     includeSelfWeight: false,
     source: "benchmark",
     revision: "Phase 6.0",
-    loads: [{ id: "UDL", type: "uniform", startXM: 0, endXM: 10, magnitudeNPerM: udl, label: "UDL" }],
+    loads: [
+      { id: "UDL", type: "uniform", startXM: 0, endXM: 10, magnitudeNPerM: udl, label: "UDL" },
+    ],
   };
-  const udlResult = analyzeStraightBeamLoadCase({ ...section, loadCase: udlCase, minimumElementCount: 10 });
+  const udlResult = analyzeStraightBeamLoadCase({
+    ...section,
+    loadCase: udlCase,
+    minimumElementCount: 10,
+  });
 
   const pointLoad = -100_000;
   const pointCase: StraightBeamLoadCase = {
@@ -43,7 +49,11 @@ export function runLoadDiagramBenchmarks(): LoadDiagramBenchmark[] {
     revision: "Phase 6.0",
     loads: [{ id: "P", type: "point", positionXM: 5, fyN: pointLoad, label: "Centre point load" }],
   };
-  const pointResult = analyzeStraightBeamLoadCase({ ...section, loadCase: pointCase, minimumElementCount: 10 });
+  const pointResult = analyzeStraightBeamLoadCase({
+    ...section,
+    loadCase: pointCase,
+    minimumElementCount: 10,
+  });
 
   return [
     {
@@ -56,7 +66,7 @@ export function runLoadDiagramBenchmarks(): LoadDiagramBenchmark[] {
     },
     {
       name: "UDL shear at left support",
-      expected: Math.abs(udl) * 10 / 2,
+      expected: (Math.abs(udl) * 10) / 2,
       actual: udlResult.extrema.maxShearN.shearN,
       unit: "N",
       tolerance: 1e-7,
@@ -64,7 +74,7 @@ export function runLoadDiagramBenchmarks(): LoadDiagramBenchmark[] {
     },
     {
       name: "UDL max moment",
-      expected: Math.abs(udl) * 10 ** 2 / 8,
+      expected: (Math.abs(udl) * 10 ** 2) / 8,
       actual: udlResult.extrema.maxMomentNm.momentNm,
       unit: "N·m",
       tolerance: 1e-7,
@@ -80,7 +90,7 @@ export function runLoadDiagramBenchmarks(): LoadDiagramBenchmark[] {
     },
     {
       name: "Point load max moment",
-      expected: Math.abs(pointLoad) * 10 / 4,
+      expected: (Math.abs(pointLoad) * 10) / 4,
       actual: pointResult.extrema.maxMomentNm.momentNm,
       unit: "N·m",
       tolerance: 1e-7,

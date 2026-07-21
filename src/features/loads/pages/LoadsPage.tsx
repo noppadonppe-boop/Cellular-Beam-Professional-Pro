@@ -22,8 +22,8 @@ export default function LoadsPage() {
           <span className="eyebrow">STRAIGHT BEAM LOADS</span>
           <h1>Load Cases & Diagrams</h1>
           <p>
-            กำหนด Load Case สำหรับคานตรงและแสดง Reaction, Shear, Moment และ Deflection
-            จาก 2D FEM engine ที่ผ่าน benchmark แล้ว
+            กำหนด Load Case สำหรับคานตรงและแสดง Reaction, Shear, Moment และ Deflection จาก 2D FEM
+            engine ที่ผ่าน benchmark แล้ว
           </p>
         </div>
         <div className="verification-summary">
@@ -36,8 +36,8 @@ export default function LoadsPage() {
       <section className="loads-notice">
         <AlertTriangle size={18} />
         <p>
-          ตัวอย่างนี้เป็น DEMO BENCHMARK สำหรับ straight simply supported beam. Load
-          combinations, envelopes, support settlement, trapezoidal loads และ standard-based factors
+          ตัวอย่างนี้เป็น DEMO BENCHMARK สำหรับ straight simply supported beam. Load combinations,
+          envelopes, support settlement, trapezoidal loads และ standard-based factors
           ยังไม่ถูกเปิดใช้ใน Phase นี้
         </p>
       </section>
@@ -54,7 +54,12 @@ export default function LoadsPage() {
           <div className="load-metrics">
             <Metric label="Span" value="10.000" unit="m" icon={<FileStack size={15} />} />
             <Metric label="Load case" value="1" unit="active" icon={<Weight size={15} />} />
-            <Metric label="Max shear" value={formatAbs(analysis.extrema.maxShearN.shearN / 1000)} unit="kN" icon={<Gauge size={15} />} />
+            <Metric
+              label="Max shear"
+              value={formatAbs(analysis.extrema.maxShearN.shearN / 1000)}
+              unit="kN"
+              icon={<Gauge size={15} />}
+            />
             <Metric
               label="Max moment"
               value={formatAbs(analysis.extrema.maxMomentNm.momentNm / 1000)}
@@ -70,9 +75,24 @@ export default function LoadsPage() {
           </div>
 
           <div className="load-diagram-stack">
-            <LoadDiagramChart title="Shear force" unit="kN" kind="shear" samples={analysis.samples} />
-            <LoadDiagramChart title="Bending moment" unit="kN·m" kind="moment" samples={analysis.samples} />
-            <LoadDiagramChart title="Vertical deflection" unit="mm" kind="deflection" samples={analysis.samples} />
+            <LoadDiagramChart
+              title="Shear force"
+              unit="kN"
+              kind="shear"
+              samples={analysis.samples}
+            />
+            <LoadDiagramChart
+              title="Bending moment"
+              unit="kN·m"
+              kind="moment"
+              samples={analysis.samples}
+            />
+            <LoadDiagramChart
+              title="Vertical deflection"
+              unit="mm"
+              kind="deflection"
+              samples={analysis.samples}
+            />
           </div>
 
           <div className="load-table-wrap">
@@ -103,7 +123,11 @@ export default function LoadsPage() {
                         ? `${(load.magnitudeNPerM / 1000).toFixed(3)} kN/m`
                         : `${(load.fyN / 1000).toFixed(3)} kN`}
                     </td>
-                    <td>{analysis.loadCase.source === "benchmark" ? "DEMO BENCHMARK" : analysis.loadCase.source}</td>
+                    <td>
+                      {analysis.loadCase.source === "benchmark"
+                        ? "DEMO BENCHMARK"
+                        : analysis.loadCase.source}
+                    </td>
                   </tr>
                 ))}
               </tbody>

@@ -19,9 +19,14 @@ const result = analyzeLinearFrame2D({
 });
 
 const benchmarks = runFemBenchmarks();
-const passing = benchmarks.filter((item) => Math.abs(item.actual - item.expected) <= item.tolerance).length;
+const passing = benchmarks.filter(
+  (item) => Math.abs(item.actual - item.expected) <= item.tolerance,
+).length;
 const maximumMomentNm = Math.max(
-  ...result.elementEndForces.flatMap((item) => [Math.abs(item.start.momentNm), Math.abs(item.end.momentNm)]),
+  ...result.elementEndForces.flatMap((item) => [
+    Math.abs(item.start.momentNm),
+    Math.abs(item.end.momentNm),
+  ]),
 );
 
 export default function AnalysisPage() {
@@ -71,7 +76,11 @@ export default function AnalysisPage() {
               value={(Math.abs(result.maximumVerticalDisplacementM) * 1000).toPrecision(4)}
               unit="mm"
             />
-            <Metric label="Max end moment" value={(maximumMomentNm / 1000).toPrecision(4)} unit="kN·m" />
+            <Metric
+              label="Max end moment"
+              value={(maximumMomentNm / 1000).toPrecision(4)}
+              unit="kN·m"
+            />
           </div>
           <BeamAnalysisDiagram />
           <div className="analysis-table-wrap">
@@ -96,7 +105,9 @@ export default function AnalysisPage() {
                       <td className="mono">{(node.uxM * 1000).toExponential(3)} mm</td>
                       <td className="mono">{(node.uyM * 1000).toExponential(3)} mm</td>
                       <td className="mono">{node.rzRad.toExponential(3)} rad</td>
-                      <td className="mono">{reaction ? (reaction.fyN / 1000).toFixed(3) : "0.000"} kN</td>
+                      <td className="mono">
+                        {reaction ? (reaction.fyN / 1000).toFixed(3) : "0.000"} kN
+                      </td>
                     </tr>
                   );
                 })}

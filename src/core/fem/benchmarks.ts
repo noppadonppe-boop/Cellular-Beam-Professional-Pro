@@ -46,7 +46,8 @@ export function runFemBenchmarks(): FemBenchmark[] {
     })),
   });
   const uniformMidspan = uniformResult.displacements.find((item) => item.nodeId === "N5")?.uyM ?? 0;
-  const uniformLeftReaction = uniformResult.reactions.find((item) => item.nodeId === "N1")?.fyN ?? 0;
+  const uniformLeftReaction =
+    uniformResult.reactions.find((item) => item.nodeId === "N1")?.fyN ?? 0;
 
   const cantileverModel = createCantileverBeamModel({
     lengthM: 4,
@@ -60,7 +61,8 @@ export function runFemBenchmarks(): FemBenchmark[] {
     ...cantileverModel,
     nodalLoads: [{ nodeId: "N2", fyN: -tipLoad }],
   });
-  const tipDeflection = cantileverResult.displacements.find((item) => item.nodeId === "N2")?.uyM ?? 0;
+  const tipDeflection =
+    cantileverResult.displacements.find((item) => item.nodeId === "N2")?.uyM ?? 0;
   const fixedMoment = cantileverResult.reactions.find((item) => item.nodeId === "N1")?.mzNm ?? 0;
 
   return [

@@ -9,7 +9,9 @@ export type StraightBeamModelOptions = Readonly<{
   elasticModulusPa: number;
 }>;
 
-export function createSimplySupportedBeamModel(options: StraightBeamModelOptions): FemAnalysisInput {
+export function createSimplySupportedBeamModel(
+  options: StraightBeamModelOptions,
+): FemAnalysisInput {
   const nodes = createStraightNodes(options.lengthM, options.elementCount);
   const elements = createStraightElements(nodes, options);
   return {
@@ -33,7 +35,8 @@ export function createCantileverBeamModel(options: StraightBeamModelOptions): Fe
 }
 
 function createStraightNodes(lengthM: number, elementCount: number): FemNode[] {
-  if (!Number.isInteger(elementCount) || elementCount < 1) throw new RangeError("elementCount must be a positive integer.");
+  if (!Number.isInteger(elementCount) || elementCount < 1)
+    throw new RangeError("elementCount must be a positive integer.");
   return Array.from({ length: elementCount + 1 }, (_, index) => ({
     id: `N${String(index + 1)}`,
     xM: (lengthM * index) / elementCount,
@@ -41,7 +44,10 @@ function createStraightNodes(lengthM: number, elementCount: number): FemNode[] {
   }));
 }
 
-function createStraightElements(nodes: readonly FemNode[], options: StraightBeamModelOptions): FemFrameElement[] {
+function createStraightElements(
+  nodes: readonly FemNode[],
+  options: StraightBeamModelOptions,
+): FemFrameElement[] {
   return nodes.slice(0, -1).map((node, index) => ({
     id: `E${String(index + 1)}`,
     startNodeId: node.id,
@@ -62,6 +68,7 @@ function lastNode(nodes: readonly FemNode[]): FemNode {
 
 function nodeAt(nodes: readonly FemNode[], index: number): FemNode {
   const node = nodes[index];
-  if (!node) throw new FemAnalysisError(`Beam model node index ${index.toString()} is not available.`);
+  if (!node)
+    throw new FemAnalysisError(`Beam model node index ${index.toString()} is not available.`);
   return node;
 }

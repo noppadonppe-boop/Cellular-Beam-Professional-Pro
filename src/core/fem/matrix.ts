@@ -2,19 +2,30 @@ import { FemAnalysisError } from "@/core/fem/models";
 
 export type Matrix = number[][];
 
-export function readVectorValue(vector: readonly number[], index: number, context = "vector"): number {
+export function readVectorValue(
+  vector: readonly number[],
+  index: number,
+  context = "vector",
+): number {
   const value = vector[index];
-  if (value === undefined) throw new FemAnalysisError(`Invalid ${context} access at index ${index.toString()}.`);
+  if (value === undefined)
+    throw new FemAnalysisError(`Invalid ${context} access at index ${index.toString()}.`);
   return value;
 }
 
 export function readMatrixRow(matrix: Matrix, row: number, context = "matrix"): number[] {
   const values = matrix[row];
-  if (!values) throw new FemAnalysisError(`Invalid ${context} row access at index ${row.toString()}.`);
+  if (!values)
+    throw new FemAnalysisError(`Invalid ${context} row access at index ${row.toString()}.`);
   return values;
 }
 
-export function readMatrixValue(matrix: Matrix, row: number, column: number, context = "matrix"): number {
+export function readMatrixValue(
+  matrix: Matrix,
+  row: number,
+  column: number,
+  context = "matrix",
+): number {
   return readVectorValue(readMatrixRow(matrix, row, context), column, context);
 }
 
@@ -22,7 +33,12 @@ export function zeros(rows: number, columns: number): Matrix {
   return Array.from({ length: rows }, () => Array.from({ length: columns }, () => 0));
 }
 
-export function addMatrix(target: Matrix, source: Matrix, rowOffset: number, columnOffset: number): void {
+export function addMatrix(
+  target: Matrix,
+  source: Matrix,
+  rowOffset: number,
+  columnOffset: number,
+): void {
   for (let row = 0; row < source.length; row += 1) {
     const sourceRow = readMatrixRow(source, row, "source matrix");
     const targetRow = readMatrixRow(target, row + rowOffset, "target matrix");
@@ -37,7 +53,9 @@ export function addMatrix(target: Matrix, source: Matrix, rowOffset: number, col
 export function transpose(matrix: Matrix): Matrix {
   const firstRow = matrix[0];
   if (!firstRow) return [];
-  return firstRow.map((_, column) => matrix.map((row) => readVectorValue(row, column, "matrix transpose")));
+  return firstRow.map((_, column) =>
+    matrix.map((row) => readVectorValue(row, column, "matrix transpose")),
+  );
 }
 
 export function multiplyMatrix(a: Matrix, b: Matrix): Matrix {
@@ -72,7 +90,10 @@ export function solveLinearSystem(matrix: Matrix, rhs: readonly number[]): numbe
   if (matrix.some((row) => row.length !== n) || rhs.length !== n) {
     throw new FemAnalysisError("Linear system dimensions are inconsistent.");
   }
-  const augmented = matrix.map((row, index) => [...row, readVectorValue(rhs, index, "right-hand side")]);
+  const augmented = matrix.map((row, index) => [
+    ...row,
+    readVectorValue(rhs, index, "right-hand side"),
+  ]);
 
   for (let pivot = 0; pivot < n; pivot += 1) {
     let pivotRow = pivot;
@@ -85,7 +106,9 @@ export function solveLinearSystem(matrix: Matrix, rhs: readonly number[]): numbe
       }
     }
     if (Math.abs(readMatrixValue(augmented, pivotRow, pivot, "augmented matrix")) < 1e-14) {
-      throw new FemAnalysisError("Stiffness matrix is singular. Check restraints and disconnected nodes.");
+      throw new FemAnalysisError(
+        "Stiffness matrix is singular. Check restraints and disconnected nodes.",
+      );
     }
     if (pivotRow !== pivot) {
       const currentPivotRow = readMatrixRow(augmented, pivot, "augmented matrix");
@@ -96,7 +119,8 @@ export function solveLinearSystem(matrix: Matrix, rhs: readonly number[]): numbe
     const pivotRowValues = readMatrixRow(augmented, pivot, "augmented matrix");
     const pivotValue = readVectorValue(pivotRowValues, pivot, "augmented matrix");
     for (let column = pivot; column <= n; column += 1) {
-      pivotRowValues[column] = readVectorValue(pivotRowValues, column, "augmented matrix") / pivotValue;
+      pivotRowValues[column] =
+        readVectorValue(pivotRowValues, column, "augmented matrix") / pivotValue;
     }
 
     for (let row = 0; row < n; row += 1) {

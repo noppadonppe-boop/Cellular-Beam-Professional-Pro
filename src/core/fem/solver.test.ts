@@ -28,7 +28,10 @@ describe("2D linear frame FEM solver", () => {
 
     for (let row = 0; row < matrix.length; row += 1) {
       for (let column = 0; column < matrix.length; column += 1) {
-        expect(readMatrixValue(matrix, row, column)).toBeCloseTo(readMatrixValue(matrix, column, row), 10);
+        expect(readMatrixValue(matrix, row, column)).toBeCloseTo(
+          readMatrixValue(matrix, column, row),
+          10,
+        );
       }
     }
   });
@@ -65,7 +68,10 @@ describe("2D linear frame FEM solver", () => {
     });
 
     const expected = (-loadN * lengthM ** 3) / (48 * elasticModulusPa * inertiaM4);
-    expect(result.displacements.find((item) => item.nodeId === "N2")?.uyM).toBeCloseTo(expected, 12);
+    expect(result.displacements.find((item) => item.nodeId === "N2")?.uyM).toBeCloseTo(
+      expected,
+      12,
+    );
   });
 
   it("matches closed-form reactions and deflection for a simply supported UDL", () => {
@@ -86,9 +92,16 @@ describe("2D linear frame FEM solver", () => {
       })),
     });
 
-    const expectedDeflection = (-5 * loadNPerM * lengthM ** 4) / (384 * elasticModulusPa * inertiaM4);
-    expect(result.reactions.find((item) => item.nodeId === "N1")?.fyN).toBeCloseTo((loadNPerM * lengthM) / 2, 7);
-    expect(result.displacements.find((item) => item.nodeId === "N5")?.uyM).toBeCloseTo(expectedDeflection, 12);
+    const expectedDeflection =
+      (-5 * loadNPerM * lengthM ** 4) / (384 * elasticModulusPa * inertiaM4);
+    expect(result.reactions.find((item) => item.nodeId === "N1")?.fyN).toBeCloseTo(
+      (loadNPerM * lengthM) / 2,
+      7,
+    );
+    expect(result.displacements.find((item) => item.nodeId === "N5")?.uyM).toBeCloseTo(
+      expectedDeflection,
+      12,
+    );
   });
 
   it("matches closed-form cantilever tip-load response", () => {
@@ -106,8 +119,14 @@ describe("2D linear frame FEM solver", () => {
     });
 
     const expectedDeflection = (-loadN * lengthM ** 3) / (3 * elasticModulusPa * inertiaM4);
-    expect(result.displacements.find((item) => item.nodeId === "N2")?.uyM).toBeCloseTo(expectedDeflection, 12);
-    expect(result.reactions.find((item) => item.nodeId === "N1")?.mzNm).toBeCloseTo(loadN * lengthM, 7);
+    expect(result.displacements.find((item) => item.nodeId === "N2")?.uyM).toBeCloseTo(
+      expectedDeflection,
+      12,
+    );
+    expect(result.reactions.find((item) => item.nodeId === "N1")?.mzNm).toBeCloseTo(
+      loadN * lengthM,
+      7,
+    );
   });
 
   it("rejects unstable models with a singular stiffness matrix", () => {

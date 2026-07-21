@@ -19,7 +19,9 @@ type AnalysisModel = Readonly<{
   uniformLoads: readonly UniformLoad[];
 }>;
 
-export function analyzeStraightBeamLoadCase(input: StraightBeamAnalysisInput): StraightBeamAnalysis {
+export function analyzeStraightBeamLoadCase(
+  input: StraightBeamAnalysisInput,
+): StraightBeamAnalysis {
   validateStraightBeamAnalysisInput(input);
   const model = buildSimplySupportedModel(input);
   const femResult = analyzeLinearFrame2D(model.femInput);
@@ -29,7 +31,11 @@ export function analyzeStraightBeamLoadCase(input: StraightBeamAnalysisInput): S
     femResult,
     samples,
     extrema: getDiagramExtrema(samples),
-    totalVerticalLoadN: getTotalVerticalLoad(input.beamLengthM, model.pointLoads, model.uniformLoads),
+    totalVerticalLoadN: getTotalVerticalLoad(
+      input.beamLengthM,
+      model.pointLoads,
+      model.uniformLoads,
+    ),
     loadCase: input.loadCase,
     analysisVersion: "straight-load-diagrams-1.0.0",
   };
@@ -74,13 +80,18 @@ export function getTotalVerticalLoad(
     (sum, load) => sum + load.magnitudeNPerM * (load.endXM - load.startXM),
     0,
   );
-  if (!Number.isFinite(beamLengthM) || beamLengthM <= 0) throw new LoadCaseError("Beam length must be positive.");
+  if (!Number.isFinite(beamLengthM) || beamLengthM <= 0)
+    throw new LoadCaseError("Beam length must be positive.");
   return pointLoadSum + uniformLoadSum;
 }
 
 function buildSimplySupportedModel(input: StraightBeamAnalysisInput): AnalysisModel {
-  const uniformLoads = [...input.loadCase.loads.filter((load): load is UniformLoad => load.type === "uniform")];
-  const pointLoads = [...input.loadCase.loads.filter((load): load is PointLoad => load.type === "point")];
+  const uniformLoads = [
+    ...input.loadCase.loads.filter((load): load is UniformLoad => load.type === "uniform"),
+  ];
+  const pointLoads = [
+    ...input.loadCase.loads.filter((load): load is PointLoad => load.type === "point"),
+  ];
   if (input.loadCase.includeSelfWeight) {
     uniformLoads.push({
       id: "AUTO-SW",
@@ -92,7 +103,12 @@ function buildSimplySupportedModel(input: StraightBeamAnalysisInput): AnalysisMo
     });
   }
 
-  const breakpoints = getBreakpoints(input.beamLengthM, input.minimumElementCount ?? 20, pointLoads, uniformLoads);
+  const breakpoints = getBreakpoints(
+    input.beamLengthM,
+    input.minimumElementCount ?? 20,
+    pointLoads,
+    uniformLoads,
+  );
   const nodes = breakpoints.map((xM, index) => ({ id: `N${String(index + 1)}`, xM, yM: 0 }));
   const elements = nodes.slice(0, -1).map((node, index) => ({
     id: `E${String(index + 1)}`,
@@ -112,7 +128,10 @@ function buildSimplySupportedModel(input: StraightBeamAnalysisInput): AnalysisMo
       const end = readNode(nodes, index + 1).xM;
       const mid = (start + end) / 2;
       const localYNPerM = uniformLoads
-        .filter((load) => mid >= load.startXM - POSITION_TOLERANCE_M && mid <= load.endXM + POSITION_TOLERANCE_M)
+        .filter(
+          (load) =>
+            mid >= load.startXM - POSITION_TOLERANCE_M && mid <= load.endXM + POSITION_TOLERANCE_M,
+        )
         .reduce((sum, load) => sum + load.magnitudeNPerM, 0);
       return { elementId: element.id, localYNPerM };
     })
@@ -208,10 +227,12 @@ function interpolateDisplacement(
   if (!element) throw new LoadCaseError("Cannot interpolate displacement without an element.");
   const startNode = femInput.nodes.find((node) => node.id === element.startNodeId);
   const endNode = femInput.nodes.find((node) => node.id === element.endNodeId);
-  if (!startNode || !endNode) throw new LoadCaseError("Cannot interpolate displacement for missing element nodes.");
+  if (!startNode || !endNode)
+    throw new LoadCaseError("Cannot interpolate displacement for missing element nodes.");
   const startDisp = femResult.displacements.find((item) => item.nodeId === startNode.id);
   const endDisp = femResult.displacements.find((item) => item.nodeId === endNode.id);
-  if (!startDisp || !endDisp) throw new LoadCaseError("Cannot interpolate displacement for missing node results.");
+  if (!startDisp || !endDisp)
+    throw new LoadCaseError("Cannot interpolate displacement for missing node results.");
   const lengthM = endNode.xM - startNode.xM;
   const xi = lengthM === 0 ? 0 : (xM - startNode.xM) / lengthM;
   const n1 = 1 - 3 * xi ** 2 + 2 * xi ** 3;
@@ -224,7 +245,8 @@ function interpolateDisplacement(
   const dn4 = -2 * xi + 3 * xi ** 2;
   return {
     deflectionM: n1 * startDisp.uyM + n2 * startDisp.rzRad + n3 * endDisp.uyM + n4 * endDisp.rzRad,
-    rotationRad: dn1 * startDisp.uyM + dn2 * startDisp.rzRad + dn3 * endDisp.uyM + dn4 * endDisp.rzRad,
+    rotationRad:
+      dn1 * startDisp.uyM + dn2 * startDisp.rzRad + dn3 * endDisp.uyM + dn4 * endDisp.rzRad,
   };
 }
 
@@ -271,7 +293,10 @@ function getSamplePositions(
   return [...new Set(positions)].sort((a, b) => a - b);
 }
 
-function getNodeIdAtPosition(nodes: readonly { id: string; xM: number }[], positionXM: number): string {
+function getNodeIdAtPosition(
+  nodes: readonly { id: string; xM: number }[],
+  positionXM: number,
+): string {
   const node = nodes.find((item) => Math.abs(item.xM - positionXM) <= POSITION_TOLERANCE_M);
   if (!node) throw new LoadCaseError(`No analysis node exists at x = ${positionXM.toString()} m.`);
   return node.id;
@@ -283,16 +308,28 @@ function readNode<T>(nodes: readonly T[], index: number): T {
   return node;
 }
 
-function maxBy(samples: readonly DiagramSample[], selector: (sample: DiagramSample) => number): DiagramSample {
+function maxBy(
+  samples: readonly DiagramSample[],
+  selector: (sample: DiagramSample) => number,
+): DiagramSample {
   const first = samples[0];
   if (!first) throw new LoadCaseError("Cannot find extrema without diagram samples.");
-  return samples.reduce((best, sample) => (selector(sample) > selector(best) ? sample : best), first);
+  return samples.reduce(
+    (best, sample) => (selector(sample) > selector(best) ? sample : best),
+    first,
+  );
 }
 
-function minBy(samples: readonly DiagramSample[], selector: (sample: DiagramSample) => number): DiagramSample {
+function minBy(
+  samples: readonly DiagramSample[],
+  selector: (sample: DiagramSample) => number,
+): DiagramSample {
   const first = samples[0];
   if (!first) throw new LoadCaseError("Cannot find extrema without diagram samples.");
-  return samples.reduce((best, sample) => (selector(sample) < selector(best) ? sample : best), first);
+  return samples.reduce(
+    (best, sample) => (selector(sample) < selector(best) ? sample : best),
+    first,
+  );
 }
 
 function roundPosition(value: number): number {
@@ -300,18 +337,34 @@ function roundPosition(value: number): number {
 }
 
 function validateStraightBeamAnalysisInput(input: StraightBeamAnalysisInput): void {
-  if (![input.beamLengthM, input.areaM2, input.inertiaM4, input.elasticModulusPa, input.steelDensityKgM3].every(Number.isFinite)) {
+  if (
+    ![
+      input.beamLengthM,
+      input.areaM2,
+      input.inertiaM4,
+      input.elasticModulusPa,
+      input.steelDensityKgM3,
+    ].every(Number.isFinite)
+  ) {
     throw new LoadCaseError("Straight beam load analysis input contains non-finite values.");
   }
-  if (input.beamLengthM <= 0 || input.areaM2 <= 0 || input.inertiaM4 <= 0 || input.elasticModulusPa <= 0) {
-    throw new LoadCaseError("Straight beam analysis geometry and material values must be positive.");
+  if (
+    input.beamLengthM <= 0 ||
+    input.areaM2 <= 0 ||
+    input.inertiaM4 <= 0 ||
+    input.elasticModulusPa <= 0
+  ) {
+    throw new LoadCaseError(
+      "Straight beam analysis geometry and material values must be positive.",
+    );
   }
   for (const load of input.loadCase.loads) {
     if (load.type === "point") {
       if (load.positionXM < 0 || load.positionXM > input.beamLengthM) {
         throw new LoadCaseError(`Point load ${load.id} is outside the beam span.`);
       }
-      if (!Number.isFinite(load.fyN)) throw new LoadCaseError(`Point load ${load.id} has an invalid force.`);
+      if (!Number.isFinite(load.fyN))
+        throw new LoadCaseError(`Point load ${load.id} has an invalid force.`);
     }
     if (load.type === "uniform") {
       if (load.startXM < 0 || load.endXM > input.beamLengthM || load.endXM <= load.startXM) {
