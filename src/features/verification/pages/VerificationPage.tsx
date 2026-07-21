@@ -1,6 +1,7 @@
 import { CheckCircle2, FlaskConical, ShieldCheck } from "lucide-react";
 import { generateCellularGeometry } from "@/core/cellular";
 import { runFemBenchmarks } from "@/core/fem";
+import { runLoadDiagramBenchmarks } from "@/core/loads";
 import { convert, quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
 
@@ -119,7 +120,8 @@ const engineeringBenchmarks: Benchmark[] = [
   },
 ];
 const femBenchmarks: Benchmark[] = runFemBenchmarks();
-const benchmarks: Benchmark[] = [...engineeringBenchmarks, ...femBenchmarks];
+const loadDiagramBenchmarks: Benchmark[] = runLoadDiagramBenchmarks();
+const benchmarks: Benchmark[] = [...engineeringBenchmarks, ...femBenchmarks, ...loadDiagramBenchmarks];
 
 export default function VerificationPage() {
   const passing = benchmarks.filter(
@@ -144,17 +146,18 @@ export default function VerificationPage() {
       <div className="verification-notice">
         <FlaskConical size={18} />
         <p>
-          These are engineering-foundation, geometry-generation, and 2D linear FEM benchmarks.
-          Design verification and cellular opening capacity checks have not started.
+          These are engineering-foundation, geometry-generation, 2D linear FEM, and straight-beam
+          load diagram benchmarks. Design verification and cellular opening capacity checks have
+          not started.
         </p>
       </div>
       <section className="benchmark-card">
         <div className="benchmark-heading">
           <div>
             <span className="eyebrow">RUNTIME EVIDENCE</span>
-            <h2>Units, sections, cellular geometry & FEM</h2>
+            <h2>Units, sections, cellular geometry, FEM & diagrams</h2>
           </div>
-          <span>Revision: Phase 5.0</span>
+          <span>Revision: Phase 6.0</span>
         </div>
         <div className="benchmark-table-wrap">
           <table className="benchmark-table">
@@ -218,6 +221,10 @@ export default function VerificationPage() {
         <div>
           <span>2D FEM analysis</span>
           <strong>6 tests</strong>
+        </div>
+        <div>
+          <span>Load diagrams</span>
+          <strong>5 tests</strong>
         </div>
       </section>
     </div>

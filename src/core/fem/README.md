@@ -24,3 +24,5 @@ Not implemented:
 - design-code utilization
 
 All values are SI canonical values and no intermediate analysis values are rounded.
+
+Phase 6 consumes this solver through `src/core/loads` for straight-beam load cases and diagrams.
