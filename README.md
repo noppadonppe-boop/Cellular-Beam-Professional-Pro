@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1-8 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight-beam load diagrams, global gross-section member screening, and cellular opening/web-post action extraction.
+Phases 1-9 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight-beam load diagrams, global gross-section member screening, cellular action extraction, and weld/stiffener/concentrated-load review schedules.
 
 ## Prerequisites
 
@@ -111,6 +111,7 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 - **Straight beam load diagrams:** Load case domain model, automatic self-weight, UDL and point load mapping, FEM-backed reactions, shear, moment, rotation, and deflection samples.
 - **Global member screening:** Traceable gross-section flexural, shear, axial, axial-flexure, and supplied serviceability-limit calculations. Stability and local buckling are intentionally not evaluated without a selected standard.
 - **Cellular action extraction:** Interpolated opening, tee, Vierendeel-demand, and web-post actions from the elastic beam analysis. No resistance, utilization, or PASS/FAIL is produced for cellular checks without a selected standard.
+- **Connection action extraction:** Longitudinal weld demand schedule and concentrated-load proximity review for stiffener detailing. No weld or local web capacity is claimed without selected code equations.
 - **Presentation layer:** Responsive React components and shadcn/ui-compatible primitives styled with Tailwind CSS.
 
 ## Coding conventions

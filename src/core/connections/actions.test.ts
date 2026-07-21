@@ -1,0 +1,6 @@
+import { describe, expect, it } from "vitest";
+import { generateCellularGeometry } from "@/core/cellular";
+import { extractConnectionActions } from "@/core/connections";
+const geometry = generateCellularGeometry({ beamLengthMm: 4000, parentDepthMm: 400, flangeWidthMm: 200, flangeThicknessMm: 16, webThicknessMm: 10, finishedDepthMm: 600, openingDiameterMm: 400, pitchMm: 600, firstOpeningCenterMm: 700, openingCount: 5, openingEccentricityMm: 0, minimumSolidEndZoneMm: 400, steelDensityKgM3: 7850, weldSizeMm: 6, cuttingPattern: "circular-interlock", weldType: "continuous-fillet" });
+const openings = geometry.openings.map((item) => ({ openingNumber: item.number, xM: item.centerXM, shearN: 10000, momentNm: 20000, topTeeAxialN: 50000, bottomTeeAxialN: 50000, teeShearN: 5000, vierendeelMomentDemandNm: 1000, status: "actionExtracted" as const }));
+describe("connection action extraction", () => { it("maps tee actions to longitudinal weld demand", () => { expect(extractConnectionActions(geometry, openings, []).welds[0]?.longitudinalForceN).toBe(50000); }); it("flags a point load adjacent to an opening for stiffener review", () => { const result = extractConnectionActions(geometry, openings, [{ id: "P1", type: "point", positionXM: 0.6, fyN: -100000, label: "Point load" }]); expect(result.concentratedLoads[0]?.requiresStiffenerReview).toBe(true); }); });

@@ -1,7 +1,12 @@
 import { AlertTriangle, CheckCircle2, CircleDashed, ClipboardCheck } from "lucide-react";
 import { checkGlobalSteelMember } from "@/core/design";
 import { extractCellularCheckActions, generateCellularGeometry } from "@/core/cellular";
-import { analyzeStraightBeamLoadCase, createPhase6BenchmarkLoadCase } from "@/core/loads";
+import { extractConnectionActions } from "@/core/connections";
+import {
+  analyzeStraightBeamLoadCase,
+  createPhase6BenchmarkLoadCase,
+  type PointLoad,
+} from "@/core/loads";
 import { quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
 
@@ -70,6 +75,11 @@ const cellularGeometry = generateCellularGeometry({
   cuttingPattern: "circular-interlock", weldType: "continuous-fillet",
 });
 const cellularActions = extractCellularCheckActions(cellularGeometry, loadAnalysis.samples);
+const connectionActions = extractConnectionActions(
+  cellularGeometry,
+  cellularActions.openings,
+  loadAnalysis.loadCase.loads.filter((load): load is PointLoad => load.type === "point"),
+);
 
 export default function DesignPage() {
   return (
@@ -106,6 +116,14 @@ export default function DesignPage() {
         <div className="cellular-action-grid">
           <div><h3>Opening actions</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Opening</th><th>x</th><th>V</th><th>M</th><th>Tee axial</th><th>Vierendeel demand</th><th>Status</th></tr></thead><tbody>{cellularActions.openings.map((item) => <tr key={item.openingNumber}><td><strong>O{item.openingNumber}</strong></td><td>{item.xM.toFixed(3)} m</td><td>{(item.shearN / 1000).toFixed(2)} kN</td><td>{(item.momentNm / 1000).toFixed(2)} kN·m</td><td>{(item.topTeeAxialN / 1000).toFixed(2)} kN</td><td>{(item.vierendeelMomentDemandNm / 1000).toFixed(2)} kN·m</td><td><span className="check-badge notEvaluated">ACTION ONLY</span></td></tr>)}</tbody></table></div></div>
           <div><h3>Web-post actions</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Post</th><th>Clear width</th><th>V</th><th>q = |V|/b</th><th>M</th><th>Status</th></tr></thead><tbody>{cellularActions.webPosts.map((item) => <tr key={item.webPostNumber}><td><strong>WP{item.webPostNumber}</strong></td><td>{(item.clearWidthM * 1000).toFixed(0)} mm</td><td>{(item.shearN / 1000).toFixed(2)} kN</td><td>{(item.horizontalShearFlowNPerM / 1000).toFixed(2)} kN/m</td><td>{(item.bendingMomentNm / 1000).toFixed(2)} kN·m</td><td><span className="check-badge notEvaluated">ACTION ONLY</span></td></tr>)}</tbody></table></div></div>
+        </div>
+      </section>
+      <section className="cellular-actions-panel connection-panel">
+        <header><div><span className="eyebrow">WELD · STIFFENER · CONCENTRATED LOAD</span><h2>Connection action schedule</h2></div><span className="unit-chip">REVIEW REQUIRED</span></header>
+        <p className="cellular-actions-note">Weld actions are based on tee force extraction. Point-load proximity is a review trigger for local web/stiffener detailing, not a capacity assessment.</p>
+        <div className="cellular-action-grid">
+          <div><h3>Longitudinal weld actions</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Location</th><th>x</th><th>Longitudinal force</th><th>Tee shear</th><th>Status</th></tr></thead><tbody>{connectionActions.welds.map((item) => <tr key={item.location}><td><strong>{item.location}</strong></td><td>{item.xM.toFixed(3)} m</td><td>{(item.longitudinalForceN / 1000).toFixed(2)} kN</td><td>{(item.shearDemandN / 1000).toFixed(2)} kN</td><td><span className="check-badge notEvaluated">ACTION ONLY</span></td></tr>)}</tbody></table></div></div>
+          <div><h3>Concentrated-load review</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Load</th><th>Force</th><th>Nearest opening</th><th>Edge distance</th><th>Stiffener review</th></tr></thead><tbody>{connectionActions.concentratedLoads.map((item) => <tr key={item.loadId}><td><strong>{item.label}</strong></td><td>{(item.forceN / 1000).toFixed(2)} kN</td><td>O{item.nearestOpeningNumber}</td><td>{(item.nearestOpeningEdgeDistanceM * 1000).toFixed(1)} mm</td><td><span className={`check-badge ${item.requiresStiffenerReview ? "fail" : "notEvaluated"}`}>{item.requiresStiffenerReview ? "REVIEW REQUIRED" : "REVIEW"}</span></td></tr>)}</tbody></table></div></div>
         </div>
       </section>
       <section className="design-layout">
