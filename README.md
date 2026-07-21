@@ -1,98 +1,125 @@
-# vinext-starter
+# Cellular Beam Professional
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Phase 1 establishes a production-oriented Vite + React + strict TypeScript foundation for a professional cellular-beam engineering application. It deliberately does **not** produce engineering calculations, utilization ratios, or PASS/FAIL results.
 
 ## Prerequisites
 
-- Node.js `>=22.13.0`
+- Node.js 22.13 or newer
+- npm 10 or newer
+- A Firebase project for authentication and persistence work
 
-## Quick Start
+## Installation
 
 ```bash
 npm install
+```
+
+## Firebase setup
+
+1. Create a Firebase project in the Firebase console.
+2. Register a Web application.
+3. Enable the required products only when their rules are ready: Authentication, Firestore, and Storage.
+4. Copy `.env.example` to `.env.local`.
+5. Add the Firebase Web configuration values to `.env.local`.
+
+```dotenv
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+Firebase Web API keys identify the Firebase project but must still be kept out of committed environment files. Security depends on Firebase Authentication, Firestore/Storage Security Rules, App Check where appropriate, and least-privilege IAM. `.env*` files are ignored; `.env.example` contains names only.
+
+## Development
+
+```bash
 npm run dev
+```
+
+Vite prints the local URL. The root route redirects to `/dashboard`.
+
+## Quality commands
+
+```bash
+npm run typecheck
+npm run lint
+npm run format:check
+npm run test
+npm run test:e2e
 npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+Playwright may require a one-time local browser installation:
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+npx playwright install chromium
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+## Routes
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+- `/login`
+- `/dashboard`
+- `/projects`
+- `/projects/:projectId/criteria`
+- `/projects/:projectId/geometry`
+- `/projects/:projectId/loads`
+- `/projects/:projectId/analysis`
+- `/projects/:projectId/design`
+- `/projects/:projectId/report`
+- `/settings`
+- `/verification`
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+## Folder structure
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+```text
+src/
+  app/                  Application bootstrap, router, providers
+  components/
+    feedback/           Error boundary and notifications
+    layout/             Application shell, sidebar, top bar, workflow
+    pages/              Shared page compositions
+    states/             Loading and empty states
+    ui/                 shadcn/ui-compatible primitives
+  features/             Feature-owned routes and UI
+    auth/ projects/ criteria/ geometry/ loads/
+    analysis/ design/ reports/ settings/ verification/
+  core/                 Pure TypeScript engineering boundary
+    quantities/ fem/ standards/
+  lib/                  Environment, Firebase, i18n, utilities
+  stores/               Zustand application stores
+  styles/               Tailwind and design tokens
+  test/                 Test environment setup
+  types/                Shared domain contracts
+tests/e2e/              Playwright tests
+```
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+As the product grows, feature folders may add `components`, `hooks`, `schemas`, `services`, and `tests` locally. Engineering calculations remain under `src/core` and cannot import React or Firebase.
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+## Architecture
 
-## Useful Commands
+- **Feature-based modular architecture:** Route-level business features own their UI and schemas.
+- **Application layer:** Router, shell, providers, theme, locale, and notifications.
+- **Infrastructure layer:** Firebase initialization from validated environment variables.
+- **Engineering core boundary:** Deterministic pure TypeScript only; no UI or persistence imports.
+- **Presentation layer:** Responsive React components and shadcn/ui-compatible primitives styled with Tailwind CSS.
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## Coding conventions
 
-## Learn More
+- TypeScript strict mode is mandatory; avoid `any` and unsafe assertions.
+- Calculation code must be pure, deterministic TypeScript.
+- UI components must not contain engineering formulas.
+- Firebase services must not perform engineering calculations.
+- Use Zod at environment, form, API, and persistence boundaries.
+- Store SI coherent canonical values internally when quantity work begins.
+- Do not round intermediate engineering values.
+- Do not display mock calculations as real results; demonstration content must be labeled.
+- Every standards formula will require source document, edition, clause, assumptions, and applicability before implementation.
+- Add unit tests beside domain behavior and Playwright coverage for critical user workflows.
+- Run typecheck, lint, tests, and build before each phase is considered complete.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+## Current limitations
+
+Authentication actions, Firestore persistence, engineering quantities, analysis, design checks, and report generation are intentionally not implemented in Phase 1.
