@@ -1,5 +1,6 @@
 import { AlertTriangle, CheckCircle2, CircleDashed, ClipboardCheck } from "lucide-react";
 import { checkGlobalSteelMember } from "@/core/design";
+import { extractCellularCheckActions, generateCellularGeometry } from "@/core/cellular";
 import { analyzeStraightBeamLoadCase, createPhase6BenchmarkLoadCase } from "@/core/loads";
 import { quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
@@ -61,23 +62,31 @@ const result = checkGlobalSteelMember({
     resistanceFactor: 1,
   },
 });
+const cellularGeometry = generateCellularGeometry({
+  beamLengthMm: 10000, parentDepthMm: 400, flangeWidthMm: 220, flangeThicknessMm: 20,
+  webThicknessMm: 12, finishedDepthMm: 600, openingDiameterMm: 400, pitchMm: 600,
+  firstOpeningCenterMm: 700, openingCount: 14, openingEccentricityMm: 0,
+  minimumSolidEndZoneMm: 400, steelDensityKgM3: 7850, weldSizeMm: 6,
+  cuttingPattern: "circular-interlock", weldType: "continuous-fillet",
+});
+const cellularActions = extractCellularCheckActions(cellularGeometry, loadAnalysis.samples);
 
 export default function DesignPage() {
   return (
     <div className="page design-page">
       <header className="page-header">
         <div>
-          <span className="eyebrow">GLOBAL STEEL MEMBER</span>
+          <span className="eyebrow">GLOBAL & CELLULAR MEMBER</span>
           <h1>Member Checks</h1>
           <p>
             Gross-section yield and serviceability screening from the active straight-beam
-            benchmark.
+            benchmark, including opening and web-post action extraction.
           </p>
         </div>
         <div className="verification-summary">
           <CheckCircle2 size={18} />
-          <strong>Phase 7</strong>
-          <span>traceable screening</span>
+          <strong>Phase 8</strong>
+          <span>traceable actions</span>
         </div>
       </header>
       <section className="design-notice">
@@ -87,6 +96,17 @@ export default function DesignPage() {
           gross-section yield or L/360 screening equation. LTB and local buckling remain unevaluated
           until a governing standard, edition, clause, and restraint model are selected.
         </p>
+      </section>
+      <section className="cellular-actions-panel">
+        <header>
+          <div><span className="eyebrow">OPENING · VIERENDEEL · WEB-POST</span><h2>Cellular action schedule</h2></div>
+          <span className="unit-chip">ACTION EXTRACTION ONLY</span>
+        </header>
+        <p className="cellular-actions-note">Opening and web-post demands are extracted from the straight-beam elastic analysis. They are not resistance or utilization checks.</p>
+        <div className="cellular-action-grid">
+          <div><h3>Opening actions</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Opening</th><th>x</th><th>V</th><th>M</th><th>Tee axial</th><th>Vierendeel demand</th><th>Status</th></tr></thead><tbody>{cellularActions.openings.map((item) => <tr key={item.openingNumber}><td><strong>O{item.openingNumber}</strong></td><td>{item.xM.toFixed(3)} m</td><td>{(item.shearN / 1000).toFixed(2)} kN</td><td>{(item.momentNm / 1000).toFixed(2)} kN·m</td><td>{(item.topTeeAxialN / 1000).toFixed(2)} kN</td><td>{(item.vierendeelMomentDemandNm / 1000).toFixed(2)} kN·m</td><td><span className="check-badge notEvaluated">ACTION ONLY</span></td></tr>)}</tbody></table></div></div>
+          <div><h3>Web-post actions</h3><div className="action-table-wrap"><table className="benchmark-table"><thead><tr><th>Post</th><th>Clear width</th><th>V</th><th>q = |V|/b</th><th>M</th><th>Status</th></tr></thead><tbody>{cellularActions.webPosts.map((item) => <tr key={item.webPostNumber}><td><strong>WP{item.webPostNumber}</strong></td><td>{(item.clearWidthM * 1000).toFixed(0)} mm</td><td>{(item.shearN / 1000).toFixed(2)} kN</td><td>{(item.horizontalShearFlowNPerM / 1000).toFixed(2)} kN/m</td><td>{(item.bendingMomentNm / 1000).toFixed(2)} kN·m</td><td><span className="check-badge notEvaluated">ACTION ONLY</span></td></tr>)}</tbody></table></div></div>
+        </div>
       </section>
       <section className="design-layout">
         <main className="design-main-panel">

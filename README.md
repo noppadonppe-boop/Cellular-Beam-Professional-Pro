@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1-7 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight-beam load diagrams, and global gross-section member screening.
+Phases 1-8 establish the application, engineering quantity/section core, project security, deterministic straight cellular-beam geometry generation, verified 2D linear FEM analysis, straight-beam load diagrams, global gross-section member screening, and cellular opening/web-post action extraction.
 
 ## Prerequisites
 
@@ -110,6 +110,7 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 - **2D FEM analysis engine:** Linear elastic Euler-Bernoulli frame elements with 3 DOF per node, dense matrix assembly, nodal loads, uniform local element loads, restraints, reactions, and local element end-force recovery.
 - **Straight beam load diagrams:** Load case domain model, automatic self-weight, UDL and point load mapping, FEM-backed reactions, shear, moment, rotation, and deflection samples.
 - **Global member screening:** Traceable gross-section flexural, shear, axial, axial-flexure, and supplied serviceability-limit calculations. Stability and local buckling are intentionally not evaluated without a selected standard.
+- **Cellular action extraction:** Interpolated opening, tee, Vierendeel-demand, and web-post actions from the elastic beam analysis. No resistance, utilization, or PASS/FAIL is produced for cellular checks without a selected standard.
 - **Presentation layer:** Responsive React components and shadcn/ui-compatible primitives styled with Tailwind CSS.
 
 ## Coding conventions
@@ -128,4 +129,4 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 
 ## Current limitations
 
-Phase 7 provides gross-section yield and serviceability screening only; it is not a standard-based design result. Lateral-torsional buckling, local buckling, code-specific resistance factors, load combinations, envelopes, cellular opening stress concentration, Vierendeel checks, web-post buckling, weld capacity, nonlinear effects, and report generation remain unimplemented. Phase 4 geometry limitations still apply: asymmetric parent sections, reinforcement, stiffeners, camber, exclusion zones, and fabrication-ready detailing are deferred. Run Firebase emulators before rule-integration development with `npm run test:rules`.
+Phase 8 produces cellular opening, tee, Vierendeel-demand, and web-post action schedules only; it is not a resistance check. Lateral-torsional buckling, local buckling, code-specific resistance factors, cellular opening stress resistance, Vierendeel capacity, web-post buckling, weld capacity, nonlinear effects, and report generation remain unimplemented. Phase 4 geometry limitations still apply: asymmetric parent sections, reinforcement, stiffeners, camber, exclusion zones, and fabrication-ready detailing are deferred. Run Firebase emulators before rule-integration development with `npm run test:rules`.
