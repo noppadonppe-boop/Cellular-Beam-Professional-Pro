@@ -1,4 +1,5 @@
 import { CheckCircle2, FlaskConical, ShieldCheck } from "lucide-react";
+import { generateCellularGeometry } from "@/core/cellular";
 import { convert, quantity } from "@/core/quantities";
 import { calculateISectionProperties } from "@/core/sections";
 
@@ -15,6 +16,24 @@ const section = calculateISectionProperties({
   flangeWidth: quantity(150, "mm", "length"),
   webThickness: quantity(6.5, "mm", "length"),
   flangeThickness: quantity(9, "mm", "length"),
+});
+const cellularGeometry = generateCellularGeometry({
+  beamLengthMm: 12000,
+  parentDepthMm: 400,
+  flangeWidthMm: 200,
+  flangeThicknessMm: 16,
+  webThicknessMm: 10,
+  finishedDepthMm: 600,
+  openingDiameterMm: 400,
+  pitchMm: 600,
+  firstOpeningCenterMm: 700,
+  openingCount: 18,
+  openingEccentricityMm: 0,
+  minimumSolidEndZoneMm: 400,
+  steelDensityKgM3: 7850,
+  weldSizeMm: 6,
+  cuttingPattern: "circular-interlock",
+  weldType: "continuous-fillet",
 });
 const benchmarks: Benchmark[] = [
   {
@@ -81,6 +100,22 @@ const benchmarks: Benchmark[] = [
     tolerance: 1e-9,
     source: "Area × 7,850 kg/m³",
   },
+  {
+    name: "Cellular opening O18 centre",
+    expected: 10900,
+    actual: (cellularGeometry.openings.at(-1)?.centerXM ?? 0) * 1000,
+    unit: "mm",
+    tolerance: 1e-9,
+    source: "xₙ = x₁ + (n − 1) pitch, CBP-CG-001",
+  },
+  {
+    name: "Cellular web-post width",
+    expected: 200,
+    actual: (cellularGeometry.webPosts[0]?.clearWidthM ?? 0) * 1000,
+    unit: "mm",
+    tolerance: 1e-9,
+    source: "pitch − opening diameter, CBP-CG-001",
+  },
 ];
 
 export default function VerificationPage() {
@@ -106,17 +141,17 @@ export default function VerificationPage() {
       <div className="verification-notice">
         <FlaskConical size={18} />
         <p>
-          These are engineering-foundation benchmarks only. Structural analysis and design
-          verification have not started.
+          These are engineering-foundation and geometry-generation benchmarks only. Structural
+          analysis and design verification have not started.
         </p>
       </div>
       <section className="benchmark-card">
         <div className="benchmark-heading">
           <div>
             <span className="eyebrow">RUNTIME EVIDENCE</span>
-            <h2>Units & section properties</h2>
+            <h2>Units, sections & cellular geometry</h2>
           </div>
-          <span>Revision: Phase 2.0</span>
+          <span>Revision: Phase 4.0</span>
         </div>
         <div className="benchmark-table-wrap">
           <table className="benchmark-table">
@@ -172,6 +207,10 @@ export default function VerificationPage() {
         <div>
           <span>UI foundation</span>
           <strong>1 test</strong>
+        </div>
+        <div>
+          <span>Cellular geometry</span>
+          <strong>6 tests</strong>
         </div>
       </section>
     </div>

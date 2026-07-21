@@ -1,6 +1,6 @@
 # Cellular Beam Professional
 
-Phases 1–3 establish the application, engineering quantity/section core, validated project settings, Firebase Authentication, and role-based Firebase Security Rules. Structural analysis has deliberately **not** started.
+Phases 1–4 establish the application, engineering quantity/section core, project security, and a deterministic straight cellular-beam geometry generator. Structural analysis has deliberately **not** started.
 
 ## Prerequisites
 
@@ -89,7 +89,7 @@ src/
     auth/ projects/ criteria/ geometry/ loads/
     analysis/ design/ reports/ settings/ verification/
   core/                 Pure TypeScript engineering boundary
-    quantities/ materials/ sections/ schemas/ fem/ standards/
+    quantities/ materials/ sections/ cellular/ schemas/ fem/ standards/
   infrastructure/       Firebase repository adapters
   lib/                  Environment, Firebase, i18n, utilities
   stores/               Zustand application stores
@@ -125,4 +125,4 @@ As the product grows, feature folders may add `components`, `hooks`, `schemas`, 
 
 ## Current limitations
 
-Structural analysis, cellular-beam checks, design checks, and report generation remain intentionally unimplemented. Phase 3 adds Firebase email/password and Google sign-in adapters, validated project settings snapshots, Firestore/Storage default-deny rules, immutable approvals/audit boundaries, and role permission tests. Run Firebase emulators before rule-integration development with `npx firebase emulators:start`.
+Structural analysis, cellular-beam capacity checks, design checks, and report generation remain intentionally unimplemented. Phase 4 supports deterministic straight-beam circular opening layout, tee geometry, web-post geometry, end-zone validation, opening schedules, interactive SVG elevation, and secured draft persistence. Asymmetric parent sections, reinforcement, stiffeners, camber, exclusion zones, and fabrication-ready detailing are deferred. Run Firebase emulators before rule-integration development with `npm run test:rules`.

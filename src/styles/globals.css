@@ -941,6 +941,357 @@ input {
   }
 }
 
+/* Phase 4 — cellular geometry workspace */
+.geometry-page {
+  max-width: 1540px;
+}
+.geometry-workspace {
+  display: grid;
+  grid-template-columns: 310px minmax(500px, 1fr) 292px;
+  gap: 13px;
+  align-items: start;
+}
+.geometry-input-card,
+.geometry-drawing,
+.geometry-table-card,
+.geometry-summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+.geometry-input-card,
+.geometry-summary-card {
+  position: sticky;
+  top: 164px;
+  max-height: calc(100vh - 205px);
+  overflow: auto;
+}
+.geometry-input-card > header,
+.geometry-summary-card > header,
+.geometry-table-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 15px;
+  border-bottom: 1px solid var(--border);
+}
+.geometry-input-card h2,
+.geometry-summary-card h2,
+.geometry-table-card h2 {
+  margin: 4px 0 0;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+.geometry-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px;
+}
+.geometry-form-grid .field span {
+  display: flex;
+  justify-content: space-between;
+}
+.geometry-form-grid .field b {
+  color: var(--primary);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 8px;
+  font-weight: 500;
+}
+.geometry-scope-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+.geometry-output {
+  display: grid;
+  gap: 13px;
+  min-width: 0;
+}
+.geometry-drawing {
+  overflow: hidden;
+}
+.geometry-drawing svg {
+  display: block;
+  width: 100%;
+  min-height: 280px;
+  color: #3c5d8e;
+  background: color-mix(in srgb, var(--surface) 94%, var(--primary));
+}
+.geometry-drawing svg text {
+  fill: var(--text-muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+}
+.dimension-line {
+  stroke: #748198;
+  stroke-width: 1;
+}
+.beam-web {
+  fill: #0b54b6;
+}
+.beam-opening {
+  fill: var(--surface);
+  stroke: #d4e1f5;
+  stroke-width: 3;
+  cursor: pointer;
+  transition:
+    stroke-width 120ms ease,
+    stroke 120ms ease;
+}
+.beam-opening:hover,
+.beam-opening.selected {
+  stroke: #ffb000;
+  stroke-width: 6;
+}
+.opening-label {
+  fill: #27456b !important;
+  font-size: 9px !important;
+  font-weight: 800;
+  pointer-events: none;
+}
+.support-shape {
+  fill: var(--text);
+}
+.drawing-legend {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 13px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 8px;
+}
+.drawing-legend span:last-child {
+  margin-left: auto;
+}
+.drawing-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 8px;
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+.legend-opening {
+  border: 2px solid var(--primary);
+  border-radius: 999px;
+}
+.legend-solid {
+  background: var(--primary);
+}
+.geometry-table-card {
+  overflow: hidden;
+}
+.geometry-table-card header span {
+  color: var(--text-muted);
+  font-size: 9px;
+}
+.geometry-table-card > div {
+  max-height: 310px;
+  overflow: auto;
+}
+.geometry-table-card table {
+  width: 100%;
+  min-width: 660px;
+  border-collapse: collapse;
+}
+.geometry-table-card th,
+.geometry-table-card td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 9px;
+}
+.geometry-table-card th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.geometry-table-card tbody tr {
+  cursor: pointer;
+}
+.geometry-table-card tbody tr:hover,
+.geometry-table-card tbody tr.selected {
+  background: var(--primary-soft);
+}
+.schedule-valid,
+.schedule-error {
+  padding: 3px 6px;
+  border-radius: 999px;
+  font-size: 7px;
+  font-weight: 800;
+}
+.schedule-valid {
+  color: var(--success);
+  background: #eaf5eb;
+}
+.schedule-error {
+  color: var(--error);
+  background: #fdebea;
+}
+.geometry-status {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 14px;
+  padding: 11px;
+  border-radius: 6px;
+}
+.geometry-status.valid {
+  color: var(--success);
+  background: #eaf5eb;
+}
+.geometry-status.invalid {
+  color: var(--error);
+  background: #fdebea;
+}
+.geometry-status strong,
+.geometry-status small {
+  display: block;
+}
+.geometry-status strong {
+  font-size: 10px;
+}
+.geometry-status small {
+  margin-top: 3px;
+  color: currentColor;
+  font-size: 8px;
+  opacity: 0.8;
+}
+.geometry-properties {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0 14px 14px;
+}
+.geometry-properties div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 8px;
+}
+.geometry-properties dt {
+  color: var(--text-muted);
+}
+.geometry-properties dd {
+  margin: 0;
+  text-align: right;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 650;
+}
+.selected-opening {
+  margin: 0 14px 14px;
+  padding: 11px;
+  border: 1px solid #afc9f7;
+  border-radius: 5px;
+  background: var(--primary-soft);
+}
+.selected-opening span,
+.selected-opening strong {
+  display: block;
+}
+.selected-opening span {
+  color: var(--primary);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+}
+.selected-opening strong {
+  margin-top: 5px;
+  font-size: 13px;
+}
+.selected-opening p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 8px;
+  line-height: 1.5;
+}
+.geometry-issues {
+  padding: 14px;
+  border-top: 1px solid var(--border);
+}
+.geometry-issues h3 {
+  margin: 0 0 9px;
+  font-size: 10px;
+}
+.geometry-issues p {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 8px;
+  line-height: 1.45;
+}
+.geometry-issues p + p {
+  margin-top: 8px;
+}
+.geometry-issues p.error {
+  color: var(--error);
+}
+.geometry-issues p.warning {
+  color: var(--warning);
+}
+@media (max-width: 1320px) {
+  .geometry-workspace {
+    grid-template-columns: 290px minmax(480px, 1fr);
+  }
+  .geometry-summary-card {
+    position: static;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 220px 1fr 280px;
+    max-height: none;
+  }
+  .geometry-summary-card > header,
+  .geometry-issues {
+    border-right: 1px solid var(--border);
+  }
+}
+@media (max-width: 900px) {
+  .geometry-workspace {
+    grid-template-columns: 1fr;
+  }
+  .geometry-input-card,
+  .geometry-summary-card {
+    position: static;
+    max-height: none;
+  }
+  .geometry-summary-card {
+    grid-column: auto;
+    display: block;
+  }
+  .geometry-input-card > header,
+  .geometry-summary-card > header,
+  .geometry-issues {
+    border-right: 0;
+  }
+}
+@media (max-width: 560px) {
+  .geometry-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .geometry-drawing svg {
+    min-width: 760px;
+  }
+  .geometry-drawing {
+    overflow-x: auto;
+  }
+  .drawing-legend span:last-child {
+    display: none;
+  }
+}
+
 .wide-page {
   max-width: 1500px;
 }

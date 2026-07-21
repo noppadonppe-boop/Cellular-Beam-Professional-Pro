@@ -78,6 +78,27 @@ describe("Firestore project authorization", () => {
       ),
     );
   });
+  it("allows designers but not viewers to save cellular geometry drafts", async () => {
+    const viewerDraft = setDoc(
+      doc(
+        environment.authenticatedContext("viewer").firestore(),
+        "cellularGeometries",
+        "p1_current",
+      ),
+      { projectId: "p1", status: "draft" },
+    );
+    await assertFails(viewerDraft);
+    await assertSucceeds(
+      setDoc(
+        doc(
+          environment.authenticatedContext("designer").firestore(),
+          "cellularGeometries",
+          "p1_current",
+        ),
+        { projectId: "p1", status: "draft" },
+      ),
+    );
+  });
   it("denies viewer project uploads", async () => {
     await assertFails(
       uploadString(
