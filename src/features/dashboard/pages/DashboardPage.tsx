@@ -63,8 +63,8 @@ function SummaryPanel() {
           <small>UTILIZED</small>
         </div>
         <div>
-          <strong>Design is passing</strong>
-          <p>2 items require engineering review.</p>
+          <strong>Demonstration status only</strong>
+          <p>Not a design conclusion. Engineering review remains required.</p>
         </div>
       </section>
       <section className="summary-section">
@@ -98,15 +98,15 @@ function SummaryPanel() {
         <dl>
           <div>
             <dt>Standard</dt>
-            <dd>AISC 360-22</dd>
+            <dd>No verified standard selected</dd>
           </div>
           <div>
             <dt>Method</dt>
-            <dd>LRFD</dd>
+            <dd>Screening only</dd>
           </div>
           <div>
             <dt>Steel grade</dt>
-            <dd>SM490</dd>
+            <dd>Demo - pending verification</dd>
           </div>
           <div>
             <dt>Deflection limit</dt>

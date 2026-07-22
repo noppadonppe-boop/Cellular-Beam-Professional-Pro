@@ -5,20 +5,21 @@ const steps = [
   "Criteria",
   "Geometry",
   "Section",
-  "Supports",
   "Loads",
   "Analysis",
   "Design",
-  "Review",
+  "Verification",
   "Report",
 ];
 const routeStep: Record<string, number> = {
   criteria: 1,
   geometry: 2,
-  loads: 5,
-  analysis: 6,
-  design: 7,
-  report: 9,
+  sections: 3,
+  loads: 4,
+  analysis: 5,
+  design: 6,
+  verification: 7,
+  report: 8,
 };
 
 export function WorkflowStepper() {
@@ -26,7 +27,7 @@ export function WorkflowStepper() {
   const matched = Object.entries(routeStep).find(([segment]) =>
     location.pathname.includes(`/${segment}`),
   );
-  const current = location.pathname === "/dashboard" ? 7 : (matched?.[1] ?? 0);
+  const current = location.pathname === "/dashboard" ? 0 : (matched?.[1] ?? 0);
   return (
     <div className="workflow-scroll">
       <ol className="workflow" aria-label="Project workflow">
