@@ -1,5 +1,6 @@
 import {
   Activity,
+  BookOpen,
   Box,
   ClipboardCheck,
   FileText,
@@ -43,6 +44,7 @@ export const navGroups = [
 ] as const;
 
 export const utilityItems = [
+  { label: "Manual", to: "/manual", icon: BookOpen },
   { label: "Revisions", to: "/verification", icon: RefreshCw },
   { labelKey: "settings", to: "/settings", icon: Settings },
 ] as const;
