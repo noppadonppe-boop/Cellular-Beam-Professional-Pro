@@ -36,7 +36,7 @@ const defaults: CellularGeometryFormValues = {
 
 export default function GeometryPage() {
   const { projectId = "demo-project" } = useParams();
-  const { user, status } = useAuth();
+  const { user } = useAuth();
   const notify = useNotificationStore((state) => state.notify);
   const [selectedOpening, setSelectedOpening] = useState<number | null>(1);
   const [saving, setSaving] = useState(false);
@@ -57,14 +57,6 @@ export default function GeometryPage() {
       });
       return;
     }
-    if (status !== "authenticated" || !user) {
-      notify({
-        title: "Sign-in required",
-        message: "The generated geometry remains a local draft until you sign in.",
-        tone: "warning",
-      });
-      return;
-    }
     setSaving(true);
     try {
       const [{ initializeFirebase }, { FirestoreCellularGeometryRepository }] = await Promise.all([
@@ -77,7 +69,7 @@ export default function GeometryPage() {
       await new FirestoreCellularGeometryRepository(firebase.db).saveDraft(
         projectId,
         validatedGeometry,
-        user.uid,
+        user?.uid ?? "anonymous",
       );
       notify({
         title: "Geometry saved",

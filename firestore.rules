@@ -11,6 +11,13 @@ service cloud.firestore {
     function canReviewProject(projectId) { return projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'checker']; }
     function canApproveProject(projectId) { return projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'approver']; }
 
+    // Shared application data. All signed-in and anonymous visitors use the
+    // same root document; no per-user collection is created.
+    match /{collectionId}/root/{menu}/{documentId} {
+      // Public shared workspace: no sign-in configuration is required.
+      allow read, write: if collectionId == 'Cellular Beam Professional Pro';
+    }
+
     match /users/{userId} { allow read, update: if signedIn() && request.auth.uid == userId; allow create: if signedIn() && request.auth.uid == userId; }
     match /organizations/{orgId} { allow read: if organizationMember(orgId); allow create: if signedIn(); allow update: if organizationMember(orgId) && organizationRole(orgId) == 'organizationAdmin'; }
     match /organizationMembers/{membershipId} { allow read: if signedIn() && resource.data.userId == request.auth.uid; allow write: if isSystemAdmin(); }

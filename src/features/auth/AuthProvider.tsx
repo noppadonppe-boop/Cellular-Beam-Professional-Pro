@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubscribe: (() => void) | undefined;
     let active = true;
     void Promise.all([import("@/lib/firebase"), import("firebase/auth")]).then(
-      ([{ initializeFirebase }, { onAuthStateChanged }]) => {
+      ([{ initializeFirebase }, { onAuthStateChanged, signInAnonymously }]) => {
         if (!active) return;
         const firebase = initializeFirebase();
         if (!firebase) {
@@ -43,6 +43,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(next);
           setStatus(next ? "authenticated" : "anonymous");
         });
+        // All visitors work in the shared root document. Anonymous auth gives
+        // Firestore a valid request identity without creating per-user folders.
+        if (!firebase.auth.currentUser) {
+          void signInAnonymously(firebase.auth).catch((error: unknown) => {
+            console.error("Anonymous Firebase sign-in failed", error);
+            setStatus("anonymous");
+          });
+        }
       },
     );
     return () => {

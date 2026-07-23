@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, ShieldCheck } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ export default function ProjectSettingsPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<ProjectSettingsInput>({
     resolver: zodResolver(projectSettingsSchema),
     defaultValues: {
@@ -87,21 +89,41 @@ export default function ProjectSettingsPage() {
         confidentiality: "confidential",
       },
       updatedAtIso: new Date().toISOString(),
-      updatedBy: user?.uid ?? "unconfigured-user",
+      updatedBy: user?.uid ?? "anonymous",
     },
   });
+  useEffect(() => {
+    if (!projectId) return;
+    let active = true;
+    void Promise.all([
+      import("@/lib/firebase"),
+      import("@/infrastructure/firebase/FirestoreProjectSettingsRepository"),
+    ])
+      .then(async ([{ initializeFirebase }, { FirestoreProjectSettingsRepository }]) => {
+        const firebase = initializeFirebase();
+        if (!firebase) return;
+        const saved = await new FirestoreProjectSettingsRepository(firebase.db).get(projectId);
+        if (active && saved) reset(saved);
+      })
+      .catch((error: unknown) => {
+        console.error("Unable to read shared project settings", error);
+      });
+    return () => {
+      active = false;
+    };
+  }, [projectId, reset]);
   const save = async (input: ProjectSettingsInput) => {
     const snapshot = projectSettingsSchema.parse({
       ...input,
       updatedAtIso: new Date().toISOString(),
-      updatedBy: user?.uid ?? "unconfigured-user",
+      updatedBy: user?.uid ?? "anonymous",
     });
     const [{ initializeFirebase }, { FirestoreProjectSettingsRepository }] = await Promise.all([
       import("@/lib/firebase"),
       import("@/infrastructure/firebase/FirestoreProjectSettingsRepository"),
     ]);
     const firebase = initializeFirebase();
-    if (!firebase || !user) {
+    if (!firebase) {
       notify({
         tone: "warning",
         title: "Not persisted",

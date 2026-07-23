@@ -11,15 +11,15 @@ import {
 } from "firebase/firestore";
 import type { SectionQuery, SectionRecord, SectionRepository } from "@/core/sections";
 import { sectionRecordDocumentSchema } from "@/core/schemas/engineering";
+import { firestoreMenuCollectionPath } from "@/infrastructure/firebase/firestore-paths";
 
 export class FirestoreSectionRepository implements SectionRepository {
-  public constructor(
-    private readonly firestore: Firestore,
-    private readonly collectionPath = "sections",
-  ) {}
+  public constructor(private readonly firestore: Firestore) {}
 
   public async getById(id: string): Promise<SectionRecord | null> {
-    const snapshot = await getDoc(doc(this.firestore, this.collectionPath, id));
+    const snapshot = await getDoc(
+      doc(this.firestore, ...firestoreMenuCollectionPath("sections"), id),
+    );
     if (!snapshot.exists()) return null;
     return sectionRecordDocumentSchema.parse(snapshot.data()) as SectionRecord;
   }
@@ -31,7 +31,7 @@ export class FirestoreSectionRepository implements SectionRepository {
         where("provenance.verificationStatus", "==", sectionQuery.verificationStatus),
       );
     const snapshot = await getDocs(
-      query(collection(this.firestore, this.collectionPath), ...constraints),
+      query(collection(this.firestore, ...firestoreMenuCollectionPath("sections")), ...constraints),
     );
     const sections = snapshot.docs.map(
       (item) => sectionRecordDocumentSchema.parse(item.data()) as SectionRecord,
@@ -44,6 +44,10 @@ export class FirestoreSectionRepository implements SectionRepository {
 
   public async save(section: SectionRecord): Promise<void> {
     const validated = sectionRecordDocumentSchema.parse(section);
-    await setDoc(doc(this.firestore, this.collectionPath, section.id), validated, { merge: false });
+    await setDoc(
+      doc(this.firestore, ...firestoreMenuCollectionPath("sections"), section.id),
+      validated,
+      { merge: false },
+    );
   }
 }
