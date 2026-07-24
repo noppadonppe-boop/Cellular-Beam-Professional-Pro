@@ -1,21 +1,8 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    function signedIn() { return request.auth != null; }
-    function projectMember(projectId) {
-      let membershipId = projectId + '_' + request.auth.uid;
-      return firestore.exists(/databases/(default)/documents/projectMembers/$(membershipId));
+    match /{allPaths=**} {
+      allow read, write: if true;
     }
-    function projectRole(projectId) {
-      let membershipId = projectId + '_' + request.auth.uid;
-      return firestore.get(/databases/(default)/documents/projectMembers/$(membershipId)).data.role;
-    }
-    function canEdit(projectId) { return signedIn() && projectMember(projectId) && projectRole(projectId) in ['projectAdmin', 'designer']; }
-    match /projects/{projectId}/{allPaths=**} {
-      allow read: if signedIn() && projectMember(projectId);
-      allow write: if canEdit(projectId) && request.resource.size < 20 * 1024 * 1024;
-    }
-    match /catalogues/{allPaths=**} { allow read: if signedIn(); allow write: if signedIn() && request.auth.token.systemAdmin == true; }
-    match /{allPaths=**} { allow read, write: if false; }
   }
 }

@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "cellular-beam-professional-pro"
+  },
+  "targets": {
+    "cellular-beam-professional-pro": {
+      "hosting": {
+        "site-01": [
+          "cellular-beam-professional-pro"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
